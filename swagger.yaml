@@ -1,0 +1,869 @@
+openapi: 3.0.3
+info:
+  title: Social Radar - Social Media Analytics Engine
+  version: 3.0.0
+  description: |
+    **Social Radar API** — Analisis perilaku user media sosial berbasis AI.
+
+    Platform yang didukung: **TikTok, Instagram, X/Twitter, Facebook, LinkedIn**
+
+    ## Autentikasi
+    Semua endpoint `/api/v1/` memerlukan API Key via:
+    - Header: `X-API-KEY: RAHASIA_AGENSIDETEKTIF_123`
+    - Query param: `?key=RAHASIA_AGENSIDETEKTIF_123`
+
+    ## Base URL
+    `http://localhost:8000`
+
+servers:
+  - url: http://localhost:8000
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    ApiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    ApiKeyQuery:
+      type: apiKey
+      in: query
+      name: key
+
+  schemas:
+    # ── Enums ──────────────────────────────────────────────────────────────
+    PlatformEnum:
+      type: string
+      enum: [instagram, tiktok, x, facebook, linkedin, threads]
+      description: Platform media sosial yang didukung
+
+    ScanTypeEnum:
+      type: string
+      enum: [USER_PROFILE, KEYWORD_TREND]
+
+    # ── Tenant ─────────────────────────────────────────────────────────────
+    TenantCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Agensi Detektif Jakarta"
+        daily_scan_limit:
+          type: integer
+          default: 50
+          example: 100
+
+    TenantResponse:
+      type: object
+      properties:
+        tenant_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Agensi Detektif Jakarta"
+        daily_scan_limit:
+          type: integer
+          example: 50
+        created_at:
+          type: string
+          format: date-time
+        is_active:
+          type: boolean
+          example: true
+
+    # ── Scan Request ───────────────────────────────────────────────────────
+    ScanRequest:
+      type: object
+      required: [tenant_id, platform, scan_type, target]
+      properties:
+        tenant_id:
+          type: integer
+          example: 1
+          description: ID tenant yang melakukan scan
+        platform:
+          $ref: '#/components/schemas/PlatformEnum'
+        scan_type:
+          $ref: '#/components/schemas/ScanTypeEnum'
+        target:
+          type: string
+          example: "lalsz_7"
+          description: Username target (tanpa @)
+
+    # ── Profile ────────────────────────────────────────────────────────────
+    Profile:
+      type: object
+      properties:
+        username:        { type: string, example: "lalsz_7" }
+        full_name:       { type: string, example: "Lalsz" }
+        bio:             { type: string, example: "Digital creator 🎬" }
+        followers:       { type: integer, example: 741 }
+        following:       { type: integer, example: 666 }
+        verified:        { type: boolean, example: false }
+        profile_pic:     { type: string, format: uri }
+        platform:        { type: string, example: "instagram" }
+        total_posts:     { type: integer, example: 20 }
+        total_likes:     { type: integer, example: 1022 }
+        is_private:      { type: boolean, example: false }
+        is_business:     { type: boolean, example: false }
+        website:         { type: string, example: "" }
+        category:        { type: string, example: "Digital creator" }
+        user_id:         { type: string, example: "52087414474" }
+        profile_url:     { type: string, format: uri }
+
+    # ── Post / Activity ────────────────────────────────────────────────────
+    Post:
+      type: object
+      properties:
+        id:              { type: string }
+        content:         { type: string, description: "Caption/teks post" }
+        post_url:        { type: string, format: uri }
+        image_url:       { type: string, format: uri }
+        video_url:       { type: string, format: uri }
+        images_list:
+          type: array
+          items: { type: string, format: uri }
+          description: "Semua foto carousel (Instagram)"
+        media_type:      { type: string, enum: [image, video, carousel], example: "video" }
+        created_at:      { type: string, example: "2026-07-01" }
+        hashtags:
+          type: array
+          items: { type: string }
+          example: ["mountains", "Canada", "fyp"]
+        mentions:
+          type: array
+          items: { type: string }
+        likes:           { type: integer, example: 31200 }
+        comments:        { type: integer, example: 18 }
+        shares:          { type: integer, example: 0 }
+        plays:           { type: integer, example: 5700 }
+        duration_sec:    { type: integer, example: 16 }
+        topic:           { type: string, example: "Petualangan Alam & Pendakian" }
+        mood:            { type: string, example: "damai, syukur, reflektif" }
+        ai_description:
+          type: string
+          description: "AI description 200+ kata dengan emoji sections (🎬📌🎭👀🏃💬🖼📊)"
+          example: "🎬 [REEL] Durasi 16 detik | 📌 TEMA: Petualangan Alam & Pendakian..."
+        visual_description: { type: string }
+        sentiment:
+          $ref: '#/components/schemas/Sentiment'
+        is_repost:       { type: boolean, example: false }
+        is_pinned:       { type: boolean, example: false }
+        music:
+          type: object
+          properties:
+            title:  { type: string }
+            author: { type: string }
+
+    # ── User Comment ───────────────────────────────────────────────────────
+    UserComment:
+      type: object
+      description: "Komentar/reply yang ditulis oleh target di postingannya sendiri"
+      properties:
+        post_url:
+          type: string
+          format: uri
+          description: "URL post yang dikomentari"
+        post_caption:
+          type: string
+          description: "Caption post yang dikomentari (80 char pertama)"
+        comment_text:
+          type: string
+          example: "@docciiiii view nya cakep parah emang 😍🔥"
+          description: "Teks komentar yang ditulis target"
+        likes:           { type: integer, example: 0 }
+        is_reply:
+          type: boolean
+          example: true
+          description: "true = reply ke komentar orang, false = komentar top-level"
+        reply_to:
+          type: string
+          example: "docciiiii"
+          description: "Username yang di-reply (jika is_reply=true)"
+        created_at:      { type: string, example: "2026-05-16" }
+        sentiment:
+          $ref: '#/components/schemas/Sentiment'
+
+    # ── Repost ─────────────────────────────────────────────────────────────
+    Repost:
+      type: object
+      description: "Konten yang di-repost oleh target"
+      properties:
+        post_url:        { type: string, format: uri }
+        original_author: { type: string, example: "virginia_sg" }
+        original_caption:{ type: string }
+        media_type:      { type: string, enum: [image, video, carousel] }
+        image_url:       { type: string, format: uri }
+        video_url:       { type: string, format: uri }
+        hashtags:
+          type: array
+          items: { type: string }
+        repost_date:     { type: string, example: "2026-06-01" }
+        likes:           { type: integer }
+        comments:        { type: integer }
+        shares:          { type: integer }
+        views:           { type: integer }
+        topic:           { type: string }
+        ai_description:  { type: string }
+        sentiment:
+          $ref: '#/components/schemas/Sentiment'
+
+    # ── Sentiment ──────────────────────────────────────────────────────────
+    Sentiment:
+      type: object
+      properties:
+        label:
+          type: string
+          enum: [POSITIVE, NEGATIVE, NEUTRAL]
+          example: "POSITIVE"
+        score:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          example: 0.92
+
+    # ── Analytics Insight ──────────────────────────────────────────────────
+    AnalyticsInsight:
+      type: object
+      properties:
+        sentiment_overall:   { type: string, enum: [POSITIVE, NEGATIVE, NEUTRAL] }
+        sentiment_score:     { type: number, format: float }
+        sentiment_breakdown:
+          type: object
+          properties:
+            POSITIVE: { type: number, example: 40.0 }
+            NEGATIVE: { type: number, example: 20.0 }
+            NEUTRAL:  { type: number, example: 40.0 }
+        risk_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 10
+        risk_level:
+          type: string
+          enum: [SANGAT RENDAH, RENDAH, SEDANG, TINGGI, SANGAT TINGGI]
+        summary_text:        { type: string }
+        ai_narrative_short:  { type: string }
+        recommendation:      { type: string }
+        green_flags:
+          type: array
+          items: { type: string }
+        red_flags:
+          type: array
+          items: { type: string }
+        top_topics:
+          type: array
+          items: { type: string }
+
+    # ── Instagram Scan Response ────────────────────────────────────────────
+    InstagramScanResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [SUCCESS, LIVE_DATA, NO_POSTS_FOUND, SCRAPE_ERROR]
+        timestamp:   { type: string, format: date-time }
+        scan_meta:
+          type: object
+          properties:
+            platform:  { type: string, example: "INSTAGRAM" }
+            target:    { type: string, example: "lalsz_7" }
+            scan_type: { type: string, example: "USER_PROFILE" }
+        profile:
+          $ref: '#/components/schemas/Profile'
+        behavior_metrics:
+          type: object
+          properties:
+            total_posts:         { type: integer, example: 20 }
+            total_user_comments: { type: integer, example: 9 }
+            total_reposts:       { type: integer, example: 10 }
+            total_likes:         { type: integer, example: 1022 }
+            total_comments:      { type: integer, example: 183 }
+            total_views:         { type: integer, example: 45000 }
+            avg_likes_per_post:  { type: number, example: 51.1 }
+            avg_comments_per_post: { type: number, example: 9.15 }
+            engagement_rate:     { type: number, example: 0.069 }
+            top_hashtags:
+              type: array
+              items: { type: string }
+              example: ["mountains", "Canada", "curug", "waterfall"]
+            top_mentions:
+              type: array
+              items: { type: string }
+            media_type_breakdown:
+              type: object
+              example: { "video": 8, "image": 7, "carousel": 5 }
+            activities:
+              type: array
+              items:
+                $ref: '#/components/schemas/Post'
+            user_comments:
+              type: array
+              description: "Komentar/reply yang ditulis target di postingannya sendiri"
+              items:
+                $ref: '#/components/schemas/UserComment'
+            reposts:
+              type: array
+              items:
+                $ref: '#/components/schemas/Repost'
+        analytics_insight:
+          $ref: '#/components/schemas/AnalyticsInsight'
+
+    # ── TikTok Scan Response ───────────────────────────────────────────────
+    TikTokScanResponse:
+      type: object
+      properties:
+        status:   { type: string }
+        profile:
+          allOf:
+            - $ref: '#/components/schemas/Profile'
+            - type: object
+              properties:
+                likes:    { type: integer, description: "Total hearts/likes di semua video" }
+                user_id:  { type: string }
+                location: { type: string }
+        behavior_metrics:
+          type: object
+          properties:
+            activities:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/Post'
+                  - type: object
+                    properties:
+                      reposts:  { type: integer }
+                      saves:    { type: integer }
+                      music:
+                        type: object
+                        properties:
+                          title:  { type: string }
+                          author: { type: string }
+            user_comments:
+              type: array
+              description: "Komentar/reply yang ditulis target di video TikTok"
+              items:
+                $ref: '#/components/schemas/UserComment'
+            reposts:
+              type: array
+              description: "Video TikTok yang di-repost target"
+              items:
+                $ref: '#/components/schemas/Repost'
+        analytics_insight:
+          $ref: '#/components/schemas/AnalyticsInsight'
+
+    # ── Error Response ─────────────────────────────────────────────────────
+    ErrorResponse:
+      type: object
+      properties:
+        status:  { type: string, example: "ERROR" }
+        error:   { type: string, example: "HTTPException" }
+        detail:  { type: string, example: "API Key tidak valid!" }
+
+# ── Security global ────────────────────────────────────────────────────────
+security:
+  - ApiKeyHeader: []
+
+# ── Paths ──────────────────────────────────────────────────────────────────
+paths:
+
+  # ── ROOT ──────────────────────────────────────────────────────────────────
+  /:
+    get:
+      tags: [System]
+      summary: Health check
+      security: []
+      responses:
+        '200':
+          description: API online
+          content:
+            application/json:
+              example:
+                status: ONLINE
+                service: "Social Radar API v3.0"
+                docs: "/docs"
+
+  # ── TENANT MANAGEMENT ─────────────────────────────────────────────────────
+  /api/v1/tenants:
+    post:
+      tags: [Tenants]
+      summary: Buat tenant baru
+      security:
+        - ApiKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantCreate'
+            example:
+              name: "Agensi Detektif Jakarta"
+              daily_scan_limit: 100
+      responses:
+        '201':
+          description: Tenant berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+        '401':
+          description: API Key tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags: [Tenants]
+      summary: Daftar semua tenant
+      security:
+        - ApiKeyHeader: []
+      responses:
+        '200':
+          description: List tenant
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TenantResponse'
+
+  /api/v1/tenants/{tenant_id}:
+    get:
+      tags: [Tenants]
+      summary: Detail tenant by ID
+      security:
+        - ApiKeyHeader: []
+      parameters:
+        - name: tenant_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Detail tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+        '404':
+          description: Tenant tidak ditemukan
+
+  # ── SCAN ──────────────────────────────────────────────────────────────────
+  /api/v1/scan/trigger:
+    post:
+      tags: [Scan]
+      summary: Trigger scan profil user media sosial
+      description: |
+        Endpoint utama untuk scan user di berbagai platform.
+
+        **Flow:**
+        1. Validasi API key + tenant
+        2. Cek quota harian tenant
+        3. Scrape data platform via Apify
+        4. Analisis AI (sentiment, risk, topic, engagement)
+        5. Return hasil lengkap
+
+        **Instagram** — Mengambil:
+        - Profile (followers, bio, kategori)
+        - 20 post terbaru (foto/video/carousel + AI description)
+        - User comments (komentar/reply yang ditulis target)
+        - Reposts (konten yang di-repost target)
+
+        **TikTok** — Mengambil:
+        - Profile + statistik
+        - 10-20 video terbaru
+        - Komentar owner per video
+        - Reposts target
+
+        **X/Twitter** — Mengambil:
+        - Profile + stats
+        - Tweet terbaru (original + reply + quote)
+        - User replies (reply ke tweet orang lain)
+      security:
+        - ApiKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScanRequest'
+            examples:
+              instagram:
+                summary: Scan Instagram
+                value:
+                  tenant_id: 1
+                  platform: instagram
+                  scan_type: USER_PROFILE
+                  target: lalsz_7
+              tiktok:
+                summary: Scan TikTok
+                value:
+                  tenant_id: 1
+                  platform: tiktok
+                  scan_type: USER_PROFILE
+                  target: khaby.lame
+              twitter:
+                summary: Scan X/Twitter
+                value:
+                  tenant_id: 1
+                  platform: x
+                  scan_type: USER_PROFILE
+                  target: elonmusk
+      responses:
+        '201':
+          description: Scan berhasil
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/InstagramScanResponse'
+                  - $ref: '#/components/schemas/TikTokScanResponse'
+              examples:
+                instagram_success:
+                  summary: Response Instagram berhasil
+                  value:
+                    status: SUCCESS
+                    timestamp: "2026-08-16T15:00:00"
+                    scan_meta:
+                      platform: INSTAGRAM
+                      target: lalsz_7
+                      scan_type: USER_PROFILE
+                    profile:
+                      username: lalsz_7
+                      full_name: Lalsz
+                      followers: 741
+                      following: 666
+                      verified: false
+                      is_private: false
+                      category: Digital creator
+                    behavior_metrics:
+                      total_posts: 20
+                      total_user_comments: 9
+                      total_reposts: 10
+                      total_likes: 1022
+                      engagement_rate: 0.069
+                      top_hashtags: ["mountains", "Canada", "curug", "waterfall"]
+                      media_type_breakdown:
+                        video: 8
+                        image: 7
+                        carousel: 5
+                      activities:
+                        - id: "DW_X5QJiX80"
+                          content: "I'd do it all over again 🏔️❤️ #mountains #Canada"
+                          post_url: "https://www.instagram.com/p/DW_X5QJiX80/"
+                          media_type: video
+                          likes: 31200
+                          comments: 18
+                          plays: 5700
+                          duration_sec: 16
+                          topic: "Petualangan Alam & Pendakian"
+                          ai_description: "🎬 [REEL] Durasi 16 detik | 📌 TEMA: Petualangan Alam & Pendakian..."
+                          sentiment:
+                            label: POSITIVE
+                            score: 0.98
+                      user_comments:
+                        - post_url: "https://www.instagram.com/p/DW_X5QJiX80/"
+                          post_caption: "I'd do it all over again 🏔️❤️ #mountains"
+                          comment_text: "@docciiiii view nya cakep parah emang 😍🔥"
+                          is_reply: true
+                          reply_to: docciiiii
+                          created_at: "2026-05-16"
+                          sentiment:
+                            label: POSITIVE
+                            score: 0.85
+                      reposts:
+                        - post_url: "https://www.instagram.com/reel/DWUs-UjkpPh/"
+                          original_author: virginia_sg
+                          original_caption: "Going back home with leg pain, 3k photos..."
+                          media_type: video
+                          likes: 30000
+                          views: 185300
+                    analytics_insight:
+                      sentiment_overall: POSITIVE
+                      sentiment_score: 0.76
+                      sentiment_breakdown:
+                        POSITIVE: 40.0
+                        NEGATIVE: 20.0
+                        NEUTRAL: 40.0
+                      risk_score: 10
+                      risk_level: SANGAT RENDAH
+                      summary_text: "lalsz_7 adalah pengguna Instagram dengan 741 followers..."
+        '400':
+          description: Request tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: API Key tidak valid
+        '429':
+          description: Quota harian habis
+          content:
+            application/json:
+              example:
+                detail: "Quota harian habis (50/50 scan). Upgrade plan atau tunggu besok."
+
+  /api/v1/scan/history/{tenant_id}:
+    get:
+      tags: [Scan]
+      summary: Riwayat scan tenant
+      security:
+        - ApiKeyHeader: []
+      parameters:
+        - name: tenant_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+          example: 20
+      responses:
+        '200':
+          description: Daftar riwayat scan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    scan_id:    { type: integer }
+                    platform:   { type: string }
+                    target:     { type: string }
+                    status:     { type: string }
+                    scanned_at: { type: string, format: date-time }
+                    followers:  { type: integer }
+                    risk_score: { type: integer }
+
+  /api/v1/scan/user/{platform}/{username}:
+    get:
+      tags: [Scan]
+      summary: Ambil hasil scan terakhir user
+      description: Ambil data scan terakhir untuk user tertentu tanpa trigger scan baru
+      security:
+        - ApiKeyHeader: []
+      parameters:
+        - name: platform
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/PlatformEnum'
+          example: instagram
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          example: lalsz_7
+      responses:
+        '200':
+          description: Hasil scan terakhir
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstagramScanResponse'
+        '404':
+          description: Data tidak ditemukan
+
+  # ── IMAGE ANALYSIS ────────────────────────────────────────────────────────
+  /api/v1/analyze-image:
+    post:
+      tags: [AI Analysis]
+      summary: Analisis gambar dengan AI
+      description: |
+        Upload gambar untuk dianalisis dengan Gemini Vision AI.
+        Mendeteksi: objek, topik, mood, teks visual, dan potensi konten berbahaya.
+      security:
+        - ApiKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File gambar (JPG, PNG, WEBP)
+      responses:
+        '200':
+          description: Hasil analisis gambar
+          content:
+            application/json:
+              example:
+                status: success
+                filename: photo.jpg
+                analysis:
+                  description: "Foto menampilkan pemandangan pegunungan..."
+                  objects: ["gunung", "awan", "jalan"]
+                  topics: ["alam", "travel", "petualangan"]
+                  mood: ["damai", "inspiratif"]
+                  text_detected: ""
+                  risk_flags: []
+                  sentiment: POSITIVE
+
+  # ── PROXY ─────────────────────────────────────────────────────────────────
+  /api/v1/proxy/image:
+    get:
+      tags: [Utilities]
+      summary: Proxy gambar/video dari CDN Instagram & TikTok
+      description: |
+        Bypass CORS restriction untuk menampilkan media Instagram/TikTok di browser.
+        Support Range requests untuk video streaming.
+      security: []
+      parameters:
+        - name: url
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uri
+          example: "https://instagram.fhex5-2.fna.fbcdn.net/v/..."
+      responses:
+        '200':
+          description: Media content
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            video/mp4:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: URL tidak valid atau tidak diizinkan
+
+  # ── DEBUG ─────────────────────────────────────────────────────────────────
+  /api/v1/debug/tiktok-raw/{username}:
+    get:
+      tags: [Debug]
+      summary: Debug raw TikTok data dari Apify
+      description: Dump semua field mentah dari dataset Apify TikTok untuk debugging
+      security:
+        - ApiKeyHeader: []
+        - ApiKeyQuery: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          example: khaby.lame
+        - name: key
+          in: query
+          schema:
+            type: string
+          example: RAHASIA_AGENSIDETEKTIF_123
+          description: API key via query param (alternatif header)
+      responses:
+        '200':
+          description: Raw data dari Apify
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:       { type: string }
+                  target:       { type: string }
+                  total_items:  { type: integer }
+                  items:
+                    type: array
+                    items:
+                      type: object
+
+  /api/v1/debug/tiktok-reposts/{username}:
+    get:
+      tags: [Debug]
+      summary: Debug TikTok reposts scraping
+      security:
+        - ApiKeyHeader: []
+        - ApiKeyQuery: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          example: khaby.lame
+        - name: key
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Debug reposts data
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/debug/ig-carousel:
+    get:
+      tags: [Debug]
+      summary: Debug Instagram carousel photo extraction
+      security:
+        - ApiKeyHeader: []
+        - ApiKeyQuery: []
+      parameters:
+        - name: url
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "https://www.instagram.com/p/DZoHlV7k3_B/"
+        - name: key
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Carousel photos debug info
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # ── DASHBOARD ─────────────────────────────────────────────────────────────
+  /social-radar:
+    get:
+      tags: [Dashboard]
+      summary: Social Radar Dashboard UI
+      description: Halaman utama dashboard Social Radar Intelligence Platform
+      security: []
+      responses:
+        '200':
+          description: HTML dashboard
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Dashboard alternatif (redirect ke /social-radar)
+      security: []
+      responses:
+        '200':
+          description: HTML dashboard
+
+  /email-checker:
+    get:
+      tags: [Dashboard]
+      summary: Email checker tool UI
+      security: []
+      responses:
+        '200':
+          description: HTML email checker tool

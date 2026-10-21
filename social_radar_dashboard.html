@@ -1,0 +1,2646 @@
+<!DOCTYPE html>
+<html lang='id'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1.0'>
+<title>Social Radar Intelligence - VORSA</title>
+<style>
+:root{--bg:#0a0d14;--panel:#0f1420;--panel2:#141928;--panel3:#1a2035;--border:#1e2840;--text:#e2e8f0;--muted:#4a5568;--accent:#00d4aa;--blue:#3b82f6;--green:#00d4aa;--orange:#f59e0b;--purple:#a855f7;--cyan:#06b6d4;--red:#f87171;--yellow:#fbbf24;--radius:10px;--card-bg:#0f1420;--card-border:#1e2840}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;min-height:100vh;display:flex;overflow:hidden}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:#1e2840;border-radius:3px}
+.sidebar{width:200px;min-width:200px;background:#080c14;border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden;flex-shrink:0}
+.sidebar-logo{padding:20px 16px 16px;border-bottom:1px solid var(--border)}
+.sidebar-logo-text{font-size:18px;font-weight:900;color:var(--accent);letter-spacing:-.5px}
+.sidebar-logo-sub{font-size:9px;color:var(--muted);margin-top:2px}
+.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:2px;text-decoration:none}
+.nav-item:hover{background:var(--panel3);color:var(--text)}
+.nav-item.active{background:rgba(0,212,170,.08);color:var(--accent);border:1px solid rgba(0,212,170,.15)}
+.nav-icon{font-size:14px;width:16px;text-align:center;flex-shrink:0}
+.sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border)}
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+.topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.topbar-title{font-size:11px;font-weight:700;color:var(--muted)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.platform-sel{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 10px;font-size:11px;font-family:inherit;outline:none}
+.target-inp{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 12px;font-size:12px;width:160px;outline:none;transition:border-color .2s}
+.target-inp:focus{border-color:var(--accent)}
+.tid-inp{width:50px;background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:11px;font-family:inherit;outline:none}
+.btn{padding:6px 14px;border-radius:6px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-scan{background:linear-gradient(135deg,var(--accent),#00a880);color:#000;box-shadow:0 2px 12px rgba(0,212,170,.3)}
+.btn-scan:hover{opacity:.9;transform:translateY(-1px)}.btn-scan:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-export{background:var(--panel3);border:1px solid var(--border);color:var(--text);font-size:10px}
+.btn-export:hover{border-color:var(--accent);color:var(--accent)}
+.content{flex:1;overflow-y:auto;padding:16px 20px}
+.profile-header{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px}
+.profile-avatar{width:60px;height:60px;border-radius:50%;background:var(--panel3);border:2px solid var(--accent);object-fit:cover;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--muted)}
+.profile-info{flex:1;min-width:0}
+.profile-name{font-size:18px;font-weight:800;color:#fff;margin-bottom:3px}
+.profile-handle{font-size:12px;color:var(--muted)}
+.profile-badges{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.badge{font-size:9px;padding:2px 8px;border-radius:20px;font-weight:700}
+.badge-verified{background:rgba(0,212,170,.15);color:var(--accent);border:1px solid rgba(0,212,170,.3)}
+.badge-platform{background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
+.badge-risk-low{background:rgba(0,212,170,.1);color:var(--green);border:1px solid rgba(0,212,170,.2)}
+.badge-risk-med{background:rgba(245,158,11,.1);color:var(--orange);border:1px solid rgba(245,158,11,.2)}
+.badge-risk-high{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.profile-meta{display:flex;gap:20px;margin-left:auto}
+.profile-meta-item{text-align:center}
+.profile-meta-val{font-size:16px;font-weight:800;color:#fff}
+.profile-meta-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;margin-top:1px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:14px}
+.card-title{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.card-title-icon{font-size:13px}
+.card-subtitle{font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.risk-gauge{position:relative;width:120px;height:70px;margin:0 auto 8px}
+.risk-gauge svg{width:120px;height:70px}
+.risk-score-num{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:26px;font-weight:900;text-align:center;line-height:1}
+.risk-level-badge{text-align:center;font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;display:inline-block}
+.sent-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.sent-bar-lbl{font-size:10px;color:var(--muted);width:28px;flex-shrink:0;font-weight:600}
+.sent-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.sent-bar-fill{height:100%;border-radius:3px;transition:width .6s}
+.sent-bar-pct{font-size:10px;font-weight:700;width:34px;text-align:right;flex-shrink:0}
+.stat-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.stat-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.stat-val{font-size:16px;font-weight:800;color:#fff}
+.stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase}
+.stat-big{font-size:28px;font-weight:900;color:#fff;line-height:1}
+.tabs-bar{display:flex;gap:4px;margin-bottom:12px}
+.tab-btn{padding:7px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;transition:all .2s}
+.tab-btn.active{background:rgba(0,212,170,.08);color:var(--accent);border-color:rgba(0,212,170,.3)}
+.tab-btn:hover:not(.active){border-color:var(--accent);color:var(--text)}
+.tab-count{background:var(--panel3);font-size:9px;padding:1px 5px;border-radius:8px;margin-left:3px}
+.tab-count.active{background:rgba(0,212,170,.2);color:var(--accent)}
+.tab-content{display:none}.tab-content.active{display:block}
+.post-card{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;transition:border-color .2s}
+.post-card:hover{border-color:rgba(0,212,170,.3)}
+.post-card-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.post-date{font-size:10px;color:var(--muted)}
+.post-platform{font-size:9px;color:var(--accent);background:rgba(0,212,170,.08);padding:1px 6px;border-radius:4px;font-weight:700}
+.post-type{font-size:9px;color:var(--blue);background:rgba(59,130,246,.08);padding:1px 6px;border-radius:4px;font-weight:700}
+.post-sentiment{font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px}
+.sent-pos{background:rgba(0,212,170,.1);color:var(--green)}
+.sent-neg{background:rgba(248,113,113,.1);color:var(--red)}
+.sent-neu{background:rgba(74,85,104,.15);color:var(--muted)}
+.post-caption{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px}
+.post-metrics{display:flex;gap:12px;margin-bottom:8px}
+.post-metric{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.post-metric-val{color:var(--text);font-weight:700}
+.expand-btn{font-size:10px;color:var(--accent);cursor:pointer;font-weight:700;border:none;background:transparent;font-family:inherit;display:flex;align-items:center;gap:4px;padding:0;transition:opacity .2s}
+.expand-btn:hover{opacity:.7}
+.ai-panel{background:var(--panel3);border:1px solid rgba(0,212,170,.15);border-radius:8px;padding:12px;margin-top:8px;display:none}
+.ai-panel.show{display:block}
+.ai-panel-section{margin-bottom:10px}
+.ai-panel-section:last-child{margin-bottom:0}
+.ai-panel-title{font-size:9px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.ai-panel-text{font-size:11px;color:#94a3b8;line-height:1.7}
+.ai-video-wrap{width:100%;border-radius:8px;overflow:hidden;margin-bottom:8px;background:#000}
+#ai-vid-player{width:100%;border-radius:8px;display:none}
+#ai-embed-wrap{}
+.flag-item{font-size:11px;display:flex;gap:6px;padding:3px 0;line-height:1.4}
+.flag-red{color:var(--red)}.flag-green{color:var(--green)}
+.htag-cloud{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.htag{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;cursor:default}
+.status-msg{text-align:center;padding:12px;font-size:12px;color:var(--muted);display:none}
+.status-msg.show{display:block}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,212,170,.2);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-ico{font-size:48px;margin-bottom:12px;opacity:.3}
+@media(max-width:900px){.grid-3,.grid-4{grid-template-columns:1fr 1fr}.sidebar{display:none}}
+@media(max-width:600px){.grid-2,.grid-3,.grid-4,.grid-2-1{grid-template-columns:1fr}}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
+.info-row:last-child{border-bottom:none}
+.info-lbl{color:var(--muted);font-weight:600}.info-val{color:var(--text);font-weight:600;text-align:right}
+.engagement-bar-wrap{margin-top:8px}
+.eng-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.eng-bar-lbl{font-size:9px;color:var(--muted);width:60px;flex-shrink:0}
+.eng-bar-bg{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.eng-bar-fill{height:100%;border-radius:2px;background:var(--accent)}
+.eng-bar-val{font-size:9px;color:var(--accent);font-weight:700;width:36px;text-align:right;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class='sidebar'>
+  <div class='sidebar-logo'>
+    <div class='sidebar-logo-text'>VORSA</div>
+    <div class='sidebar-logo-sub'>Social Intelligence</div>
+  </div>
+  <nav class='sidebar-nav'>
+    <a href='/social-radar' class='nav-item active'><span class='nav-icon'>&#128269;</span>Scan Target</a>
+    <a href='/email-checker' class='nav-item'><span class='nav-icon'>&#128231;</span>OSINT Checker</a>
+    <a href='/docs' class='nav-item'><span class='nav-icon'>&#128196;</span>API Docs</a>
+  </nav>
+  <div class='sidebar-bottom'>
+    <div style='font-size:9px;color:var(--muted);text-align:center'>Social Radar v3.0</div>
+  </div>
+</div>
+<div class='main-area'>
+  <div class='topbar'>
+    <span class='topbar-title'>SCAN TARGET</span>
+    <div class='topbar-right'>
+      <select class='platform-sel' id='platform'>
+        <option value='tiktok'>&#127925; TikTok</option>
+        <option value='instagram'>&#128247; Instagram</option>
+        <option value='x'>&#128038; X/Twitter</option>
+        <option value='facebook'>&#128101; Facebook</option>
+        <option value='linkedin'>&#128188; LinkedIn</option>
+      </select>
+      <input class='target-inp' id='target' type='text' placeholder='@username' value='khaby.lame'/>
+      <input type='number' id='tenant_id' value='1' min='1' class='tid-inp' title='Tenant ID'/>
+      <button class='btn btn-scan' id='scanBtn' onclick='doScan()'>&#128269; Scan</button>
+      <button class='btn btn-export' onclick='exportPDF()' id='btn-export' style='display:none'>&#128196; Export PDF</button>
+    </div>
+  </div>
+  <div class='status-msg' id='statusMsg'></div>
+  <div class='content' id='mainContent'>
+    <div class='empty-state' id='emptyState'>
+      <div class='empty-ico'>&#128269;</div>
+      <div style='font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px'>Mulai Investigasi</div>
+      <div style='font-size:12px;color:var(--muted)'>Masukkan username target dan klik Scan untuk memulai analisis intelijen digital.</div>
+    </div>
+    <div id='dashboard' style='display:none'>
+      <!-- Profile Header -->
+      <div class='profile-header' id='profileHeader'></div>
+      <!-- Gemini Notice — muncul jika analisis caption-only -->
+      <div id='geminiNotice' style='display:none;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:9px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px'>
+        <span style='font-size:16px'>&#128273;</span>
+        <div style='flex:1;font-size:11px;color:#f59e0b;line-height:1.6'>
+          <strong>AI Visual Analysis tidak aktif.</strong> Analisis dilakukan berdasarkan caption saja.
+          Untuk analisis konten video mendalam, tambahkan <code style='background:rgba(245,158,11,.15);padding:1px 5px;border-radius:3px;font-size:10px'>GEMINI_API_KEY=AIzaSy...</code> di file .env &mdash;
+          dapatkan gratis di <a href='https://aistudio.google.com/app/apikey' target='_blank' style='color:#f59e0b;font-weight:700'>Google AI Studio</a>
+        </div>
+        <button onclick='document.getElementById("geminiNotice").style.display="none"' style='background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px'>&#10005;</button>
+      </div>
+      <!-- Row 1: Profile Info + Risk + Sentiment + Engagement -->
+      <div class='grid-4'>
+        <div class='card' id='profileInfoCard'><div class='card-title'><span class='card-title-icon'>&#128100;</span>Profile Information</div><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+        <div class='card' id='riskCard'><div class='card-title'><span class='card-title-icon'>&#9888;&#65039;</span>Risk Assessment</div><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+        <div class='card' id='sentimentCard'><div class='card-title'><span class='card-title-icon'>&#128200;</span>Sentiment Analysis</div><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+        <div class='card' id='engagementCard'><div class='card-title'><span class='card-title-icon'>&#128293;</span>Engagement Analysis</div><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+      </div>
+      <!-- Row 2: Posting + Hashtag + Keywords + Behavioral -->
+      <div class='grid-4'>
+        <div class='card' id='postingCard'><div class='card-title'><span class='card-title-icon'>&#128221;</span>Posting Activity</div><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+        <div class='card' id='hashtagCard'><div class='card-title'><span class='card-title-icon'>&#127991;&#65039;</span>Hashtag Analysis</div><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+        <div class='card' id='keywordsCard'><div class='card-title'><span class='card-title-icon'>&#128273;</span>Keywords &amp; Topics</div><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+        <div class='card' id='behavioralCard'><div class='card-title'><span class='card-title-icon'>&#129504;</span>Behavioral Analysis</div><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+      </div>
+      <!-- AI Summary Banner — full width, desain khusus -->
+      <div id='aiSummaryCard' style='margin-bottom:12px'><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+      <!-- Topic Detection — full width -->
+      <div id='topicDetectionCard' style='margin-bottom:12px'><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+      <!-- Row 3: Caption Analysis -->
+      <div style='margin-bottom:12px'>
+        <div class='card' id='captionCard'><div class='card-title'><span class='card-title-icon'>&#128461;</span>Caption Analysis</div><div style='color:var(--muted);font-size:11px'>Loading...</div></div>
+      </div>
+      <!-- Posts Tabs -->
+      <div class='tabs-bar'>
+        <button class='tab-btn active' id='tbtn-posts'        onclick='switchTab2("posts",this)'><span id='x-tab-posts-lbl'>&#127917; Posts</span> <span class='tab-count active' id='cnt-posts'>0</span></button>
+        <!-- X/Twitter tabs -->
+        <button class='tab-btn'        id='tbtn-replies'      onclick='switchTab2("replies",this)'   style='display:none'><span>&#128172; Replies</span> <span class='tab-count' id='cnt-replies'>0</span></button>
+        <button class='tab-btn'        id='tbtn-reposts'      onclick='switchTab2("reposts",this)'   style='display:none'><span id='x-tab-reposts-lbl'>&#128257; Reposts</span> <span class='tab-count' id='cnt-reposts'>0</span></button>
+        <button class='tab-btn'        id='tbtn-media'        onclick='switchTab2("media",this)'     style='display:none'><span>&#127910; Media</span> <span class='tab-count' id='cnt-media'>0</span></button>
+        <button class='tab-btn'        id='tbtn-usercomments' onclick='switchTab2("usercomments",this)' style='display:none'><span>&#128483; User Comments</span> <span class='tab-count' id='cnt-usercomments'>0</span></button>
+        <button class='tab-btn'        id='tbtn-comments'     onclick='switchTab2("comments",this)'  style='display:none'><span id='x-tab-comments-lbl'>&#128172; Comments</span> <span class='tab-count' id='cnt-comments'>0</span></button>
+        <!-- Facebook tabs: Posts, About, Channels, Mentions, Reels, Photos, User Comments -->
+        <button class='tab-btn'        id='tbtn-fb-about'     onclick='switchTab2("fb-about",this)'    style='display:none'><span>&#128101; About</span></button>
+        <button class='tab-btn'        id='tbtn-fb-channels'  onclick='switchTab2("fb-channels",this)' style='display:none'><span>&#128250; Channels</span> <span class='tab-count' id='cnt-fb-channels'>0</span></button>
+        <button class='tab-btn'        id='tbtn-fb-mentions'  onclick='switchTab2("fb-mentions",this)' style='display:none'><span>&#128273; Mentions</span> <span class='tab-count' id='cnt-fb-mentions'>0</span></button>
+        <button class='tab-btn'        id='tbtn-fb-reels'     onclick='switchTab2("fb-reels",this)'    style='display:none'><span>&#127910; Reels</span> <span class='tab-count' id='cnt-fb-reels'>0</span></button>
+        <button class='tab-btn'        id='tbtn-fb-photos'    onclick='switchTab2("fb-photos",this)'   style='display:none'><span>&#128247; Photos</span> <span class='tab-count' id='cnt-fb-photos'>0</span></button>
+        <button class='tab-btn'        id='tbtn-fb-uc'        onclick='switchTab2("fb-uc",this)'       style='display:none'><span>&#128172; User Comments</span> <span class='tab-count' id='cnt-fb-uc'>0</span></button>
+        <div style='margin-left:auto'><button class='btn btn-export' onclick='showAllPosts()' style='display:none;font-size:10px' id='btn-show-all'>Show All &#9660;</button></div>
+      </div>
+      <div class='tab-content active' id='tab-posts'><div class='empty-state'><div class='empty-ico'>&#128221;</div><div>Scan untuk melihat postingan</div></div></div>
+      <div class='tab-content'        id='tab-replies'><div class='empty-state'><div class='empty-ico'>&#128172;</div><div>Scan untuk melihat replies</div></div></div>
+      <div class='tab-content'        id='tab-reposts'><div class='empty-state'><div class='empty-ico'>&#128257;</div><div>Scan untuk melihat reposts</div></div></div>
+      <div class='tab-content'        id='tab-media'><div class='empty-state'><div class='empty-ico'>&#127910;</div><div>Scan untuk melihat media</div></div></div>
+      <div class='tab-content'        id='tab-usercomments'><div class='empty-state'><div class='empty-ico'>&#128483;</div><div>Scan untuk melihat user comments</div></div></div>
+      <div class='tab-content'        id='tab-comments'><div class='empty-state'><div class='empty-ico'>&#128172;</div><div>Scan untuk melihat komentar</div></div></div>
+      <div class='tab-content'        id='tab-fb-about'><div class='empty-state'><div class='empty-ico'>&#128101;</div><div>Scan untuk melihat info profil</div></div></div>
+      <div class='tab-content'        id='tab-fb-channels'><div class='empty-state'><div class='empty-ico'>&#128250;</div><div>Scan untuk melihat channels</div></div></div>
+      <div class='tab-content'        id='tab-fb-mentions'><div class='empty-state'><div class='empty-ico'>&#128273;</div><div>Scan untuk melihat mentions</div></div></div>
+      <div class='tab-content'        id='tab-fb-reels'><div class='empty-state'><div class='empty-ico'>&#127910;</div><div>Scan untuk melihat reels</div></div></div>
+      <div class='tab-content'        id='tab-fb-photos'><div class='empty-state'><div class='empty-ico'>&#128247;</div><div>Scan untuk melihat foto</div></div></div>
+      <div class='tab-content'        id='tab-fb-uc'><div class='empty-state'><div class='empty-ico'>&#128172;</div><div>Scan untuk melihat user comments</div></div></div>
+    </div>
+  </div>
+</div>
+<script>
+const AK='RAHASIA_AGENSIDETEKTIF_123';
+let P=[],R=[],C=[],INS={},PRF={},PLT='tiktok';
+let XQ=[],XBM={};  // X/Twitter: quotes + behavior metrics extra
+var _showAll=false;
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function proxyImg(url){
+  if(!url)return'';
+  // Apify KV URL sudah punya token — akses langsung tanpa proxy
+  if(url.indexOf('api.apify.com')!==-1)return url;
+  // TikTok profile pic: langsung pakai URL asli, tidak perlu proxy
+  if(PLT==='tiktok'){
+    if(url.indexOf('p16-sign')!==-1||url.indexOf('p9-sign')!==-1||url.indexOf('musically-maliva')!==-1)
+      return url;
+    return '/api/v1/proxy/image?url='+encodeURIComponent(url);
+  }
+  if(PLT==='instagram')return '/api/v1/proxy/image?url='+encodeURIComponent(url);
+  return url;
+}
+function proxyVideo(url){if(!url)return'';if(PLT==='instagram')return '/api/v1/proxy/image?url='+encodeURIComponent(url);return url;}
+function igCarouselNav(cid,total,dir,cntId){var el=document.getElementById(cid);if(!el)return;var cur=el._cidx||0;cur=(cur+dir+total)%total;el._cidx=cur;el.style.transform='translateX(-'+(cur*100)+'%)';var cnt=document.getElementById(cntId);if(cnt)cnt.textContent=(cur+1)+' / '+total;var dots=document.querySelectorAll('.dot-'+cid);dots.forEach(function(d,i){d.style.background=i===cur?'#fff':'rgba(255,255,255,.4)';});}
+function fmt(n){n=Number(n)||0;if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return String(n);}
+function pct(n){return Math.round(Number(n)||0);}
+function ss(m){var el=document.getElementById('statusMsg');if(!el)return;if(m){el.innerHTML=m;el.classList.add('show');}else{el.innerHTML='';el.classList.remove('show');}}
+function getSent(x){return((typeof x.sentiment==='string'?x.sentiment:(x.sentiment||{}).label)||'NEUTRAL').toUpperCase();}
+function sentCls(s){s=(s||'').toLowerCase();if(s==='positive')return'sent-pos';if(s==='negative')return'sent-neg';return'sent-neu';}
+function sentLbl(s){s=(s||'').toLowerCase();if(s==='positive')return'POSITIVE';if(s==='negative')return'NEGATIVE';return'NEUTRAL';}
+function sentColor(s){s=(s||'').toLowerCase();if(s==='positive')return'#00d4aa';if(s==='negative')return'#f87171';return'#4a5568';}
+function riskColor(r){r=Number(r)||0;if(r>=70)return'#f87171';if(r>=40)return'#f59e0b';return'#00d4aa';}
+function riskLbl(r){r=Number(r)||0;if(r>=70)return'HIGH RISK';if(r>=40)return'MODERATE';return'LOW RISK';}
+
+// ── (session update removed) ─────────────────────────────────────────────
+function switchTab2(n,b){
+  document.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active');x.querySelectorAll('.tab-count').forEach(function(c){c.classList.remove('active');});});
+  document.querySelectorAll('.tab-content').forEach(function(x){x.classList.remove('active');});
+  b.classList.add('active');var tc=b.querySelector('.tab-count');if(tc)tc.classList.add('active');
+  var t=document.getElementById('tab-'+n);if(t)t.classList.add('active');
+}
+function showAllPosts(){_showAll=true;renderPosts();}
+async function doScan(){
+  var target=(document.getElementById('target').value||'').trim().replace('@','');
+  var platform=document.getElementById('platform').value;
+  var tid=parseInt(document.getElementById('tenant_id').value)||1;
+  if(!target){alert('Masukkan username target!');return;}
+  PLT=platform;_showAll=false;
+  var btn=document.getElementById('scanBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Scanning...';
+  ss('<span class="spinner"></span>Scanning @'+target+' via '+platform+'...');
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('dashboard').style.display='none';
+  try{
+    var res=await fetch(location.origin+'/api/v1/scan/trigger',{method:'POST',headers:{'Content-Type':'application/json','X-API-KEY':AK},body:JSON.stringify({tenant_id:tid,platform:platform,scan_type:'USER_PROFILE',target:target})});
+    var data=await res.json();
+    if(!res.ok){ss('Error: '+esc(data.detail||res.status));return;}
+    PRF=data.profile||{};INS=data.analytics_insight||{};
+    var m=data.behavior_metrics||{};
+    P=m.activities||[];
+    C=m.user_comments||[];
+    R=m.retweets||m.reposts||[];
+    // X/Twitter extra
+    XQ=m.quotes||m.quotes_list||data.quotes_list||[];
+    XBM=m;  // simpan semua behavior_metrics termasuk photos/reels/mentions untuk Facebook
+    ss('');
+    document.getElementById('dashboard').style.display='block';
+    renderAll();
+    var bex=document.getElementById('btn-export');if(bex)bex.style.display='';
+  }catch(e){ss('Error: '+esc(e.message));}
+  finally{btn.disabled=false;btn.innerHTML='&#128269; Scan';}
+}
+function getAnalysisMethodSummary(){
+  if(!P.length)return'';
+  var geminiCount=P.filter(function(p){return p.analysis_method==='gemini_vision';}).length;
+  var whisperCount=P.filter(function(p){return p.analysis_method==='whisper_ocr';}).length;
+  var captionCount=P.filter(function(p){return(!p.analysis_method||p.analysis_method==='caption_only');}).length;
+  if(geminiCount===P.length)return'gemini';
+  if(captionCount===P.length)return'caption';
+  return'mixed';
+}
+function renderAll(){
+  renderProfileHeader();renderProfileInfo();renderRisk();renderSentiment();renderEngagement();
+  // Gemini notice — tampilkan jika semua analisis caption-only
+  var _mSummary=getAnalysisMethodSummary();
+  var _noticeEl=document.getElementById('geminiNotice');
+  if(_noticeEl){
+    if(_mSummary==='caption'){
+      _noticeEl.style.display='block';
+    } else {
+      _noticeEl.style.display='none';
+    }
+  }
+  renderPosting();renderHashtags();renderKeywords();renderBehavioral();renderAISummary();renderTopicDetection();renderCaption();
+  var isX=(PLT==='x'||PLT==='twitter');
+
+  // ── Tampilkan/sembunyikan tab berdasarkan platform ────────────────────
+  var _els={
+    replies:      document.getElementById('tbtn-replies'),
+    media:        document.getElementById('tbtn-media'),
+    usercomments: document.getElementById('tbtn-usercomments'),
+    comments:     document.getElementById('tbtn-comments'),  // non-X
+    reposts:      document.getElementById('tbtn-reposts'),
+  };
+  // X mode: tampilkan replies/media/usercomments/reposts, sembunyikan legacy comments
+  if(_els.replies)     _els.replies.style.display     = isX ? '' : 'none';
+  if(_els.reposts)     _els.reposts.style.display     = isX ? '' : 'none';
+  if(_els.media)       _els.media.style.display       = isX ? '' : 'none';
+  if(_els.usercomments)_els.usercomments.style.display= isX ? '' : 'none';
+  if(_els.comments)    _els.comments.style.display    = isX ? 'none' : '';
+  // Rename reposts label
+  var _lr=document.getElementById('x-tab-reposts-lbl');
+  var _lp=document.getElementById('x-tab-posts-lbl');
+  if(isX){
+    if(_lp)_lp.innerHTML='&#128221; Posts';
+    if(_lr)_lr.innerHTML='&#128257; Reposts';
+  } else {
+    if(_lp)_lp.innerHTML='&#127917; Created Posts';
+    if(_lr)_lr.innerHTML='&#128257; Reposted Videos';
+  }
+
+  if(isX){
+    // ── Semua activities dari server ──────────────────────────────────
+    var allActs=(XBM&&XBM.activities&&XBM.activities.length)?XBM.activities:P;
+
+    // ── Filter per tipe — tweet_type field PLUS boolean fallbacks ─────
+    function _isReply(a){
+      var t=(a.tweet_type||'').toUpperCase();
+      if(t==='REPLY')return true;
+      if(a.is_reply===true)return true;
+      var tx=a.text||'';
+      // "@username blabla" tapi bukan "RT @"
+      return tx.startsWith('@')&&!tx.startsWith('RT @');
+    }
+    function _isRT(a){
+      var t=(a.tweet_type||'').toUpperCase();
+      if(t==='RETWEET')return true;
+      if(a.is_retweet===true||a.is_repost===true)return true;
+      var tx=a.text||a.content||'';
+      return tx.startsWith('RT @');
+    }
+    function _isQuote(a){
+      var t=(a.tweet_type||'').toUpperCase();
+      if(t==='QUOTE')return true;
+      if(a.is_quote===true)return true;
+      return false;
+    }
+    function _hasMedia(a){
+      var med=a.media||{};
+      // Cek nested media object (X format)
+      if(med.image_url&&med.image_url.length>0)return true;
+      if(med.video_url&&med.video_url.length>0)return true;
+      if(med.gif_url&&med.gif_url.length>0)return true;
+      if(med.all_media&&med.all_media.length>0)return true;
+      // Cek flat fields juga (fallback)
+      if(a.image_url&&a.image_url.length>0)return true;
+      if(a.video_url&&a.video_url.length>0&&a.video_url.indexOf('tiktok.com')===-1)return true;
+      if(a.cover_url&&a.cover_url.length>0)return true;
+      // Cek media_type bukan "text"
+      if(a.media_type&&a.media_type!=='text')return true;
+      if(med.type&&med.type!=='text')return true;
+      return false;
+    }
+
+    var _xReplies = allActs.filter(_isReply);
+    var _xRTs     = allActs.filter(_isRT);
+    var _xQTs     = allActs.filter(_isQuote);
+    var _xMedia   = allActs.filter(_hasMedia);
+    // Posts = semua yang bukan pure RT (termasuk reply dan quote, karena user buat konten itu)
+    var _xPosts   = allActs.filter(function(a){return !_isRT(a);});
+    if(!_xPosts.length) _xPosts = allActs;
+
+    // Merge server-side retweets jika lebih banyak dari filter hasil
+    var _srvRTs = (XBM&&XBM.retweets)||R||[];
+    if(_srvRTs.length > _xRTs.length) _xRTs = _srvRTs;
+
+    // Fallback: kalau _xRTs masih kosong, cari dari allActs yang text-nya RT @
+    // atau is_retweet/is_repost = true
+    if(!_xRTs.length){
+      var _rtFallback=allActs.filter(function(a){
+        var tx=a.text||a.content||'';
+        return tx.startsWith('RT @')||a.is_retweet===true||a.is_repost===true||
+               (a.tweet_type||'').toUpperCase()==='RETWEET';
+      });
+      if(_rtFallback.length) _xRTs=_rtFallback;
+    }
+
+    // Convert _xRTs ke format repost object untuk renderXReposts
+    if(_xRTs.length && (!R.length || R.length < _xRTs.length)){
+      R = _xRTs.map(function(rt){
+        // Extract original author dari "RT @username: text"
+        var tx=rt.text||rt.content||'';
+        var rtMatch=tx.match(/^RT @(\w+):/);
+        var origAuthor=rt.original_author||rt.orig_author||(rtMatch?rtMatch[1]:'');
+        var origText=tx.replace(/^RT @\w+:\s*/,'').substring(0,300);
+        var m=rt.metrics||{};
+        return {
+          tweet_url:          rt.tweet_url||rt.post_url||'',
+          original_author:    origAuthor,
+          original_author_url: origAuthor?('https://x.com/'+origAuthor):'',
+          original_tweet_url: rt.referenced_tweet_url||'',
+          original_text:      origText,
+          original_caption:   origText,
+          repost_date:        rt.created_at||'',
+          created_at:         rt.created_at||'',
+          hashtags:           rt.hashtags||[],
+          metrics:            {likes:m.likes||rt.likes||0,retweets:m.retweets||0,
+                               replies:m.replies||0,quotes:m.quotes||0,views:m.views||0},
+          sentiment:          rt.sentiment||{label:'NEUTRAL',score:0.5},
+        };
+      });
+    }
+
+    // Merge server-side user_comments sebagai Replies jika filter kosong
+    var _srvUC = (XBM&&XBM.user_comments)||C||[];
+    if(_xReplies.length === 0 && _srvUC.length > 0) {
+      // Konversi user_comments ke format activities agar bisa di-render renderXReplies
+      _xReplies = _srvUC.map(function(uc){
+        return {
+          tweet_type: 'REPLY',
+          is_reply: true,
+          text: uc.reply_text||uc.content||'',
+          content: uc.reply_text||uc.content||'',
+          tweet_url: uc.post_url||uc.tweet_url||'',
+          post_url: uc.post_url||'',
+          created_at: uc.created_at||'',
+          in_reply_to_user: uc.reply_to||uc.in_reply_to_user||'',
+          reply_to: uc.reply_to||uc.in_reply_to_user||'',
+          metrics: {likes:uc.likes||0,replies:uc.replies||0,quotes:uc.quotes||0,views:0},
+          likes: uc.likes||0,
+          hashtags: [],
+          sentiment: uc.sentiment||{label:'NEUTRAL',score:0.5},
+        };
+      });
+    }
+
+    // user_comments tab = semua dari server behavior_metrics.user_comments
+    var _xUC = _srvUC;
+
+    // Update globals — R sudah di-assign di blok retweet di atas
+    P = _xPosts;
+    C = _xReplies;
+    if(!R.length) R = _xRTs;  // hanya update kalau belum di-assign dari konversi
+
+    // Update counts
+    document.getElementById('cnt-posts').textContent        = _xPosts.length;
+    document.getElementById('cnt-replies').textContent      = _xReplies.length;
+    document.getElementById('cnt-reposts').textContent      = R.length||_xRTs.length;
+    document.getElementById('cnt-media').textContent        = _xMedia.length;
+    document.getElementById('cnt-usercomments').textContent = _xUC.length;
+
+    // Render semua tab
+    renderXPosts();
+    renderXReplies(_xReplies);
+    renderXReposts();  // akan auto-detect RT @ dari allActs jika R kosong
+    // Update cnt-reposts setelah render karena renderXReposts bisa detect RT baru
+    var _finalRLen=document.getElementById('tab-reposts')?
+      (document.getElementById('tab-reposts').querySelectorAll('.post-card').length)||R.length:R.length;
+    document.getElementById('cnt-reposts').textContent=_finalRLen||R.length;
+    renderXMedia(_xMedia);
+    renderXUserComments(_xUC);
+
+  } else if(PLT==='facebook'){
+    // ── Facebook platform ─────────────────────────────────────────────
+    // Sembunyikan semua non-FB tabs
+    ['tbtn-replies','tbtn-reposts','tbtn-media','tbtn-usercomments','tbtn-comments'].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.style.display='none';
+    });
+    // Tampilkan 7 tab Facebook
+    ['tbtn-fb-about','tbtn-fb-channels','tbtn-fb-mentions',
+     'tbtn-fb-reels','tbtn-fb-photos','tbtn-fb-uc'].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.style.display='';
+    });
+    // Rename Posts tab
+    var _lp=document.getElementById('x-tab-posts-lbl');
+    if(_lp)_lp.innerHTML='&#128221; Posts';
+
+    var _allP=P||[];
+
+    // ── REELS: HANYA dari XBM.reels (dedicated scraper) — tidak pernah dari posts
+    var _fbReels=(XBM&&XBM.reels&&XBM.reels.length)?XBM.reels.slice(0,10):[];
+
+    // ── MENTIONS: bertingkat, level 3 TIDAK fallback ke semua posts ──
+    var _fbMentions=(XBM&&XBM.mentions&&XBM.mentions.length)
+      ? XBM.mentions.slice(0,10)
+      : (function(){
+          // Level 1: ada @mention atau tagged_users
+          var r=_allP.filter(function(p){
+            var tx=p.content||p.text||p.caption||'';
+            return (p.mentions&&p.mentions.length>0)
+                ||(p.tagged_users&&p.tagged_users.length>0)
+                ||tx.indexOf('@')!==-1;
+          });
+          // Level 2: ada hashtag
+          if(!r.length) r=_allP.filter(function(p){
+            var tx=p.content||p.text||p.caption||'';
+            return (p.hashtags&&p.hashtags.length>0)||tx.indexOf('#')!==-1;
+          });
+          // Level 3: kosong → biarkan, renderFBMentions akan tampilkan empty state
+          return r.slice(0,10);
+        })();
+
+    // ── PHOTOS: dari server (XBM.photos) atau extract dari image-only posts
+    var _fbPhotosData=(XBM&&XBM.photos&&XBM.photos.length)?XBM.photos:[];
+    if(!_fbPhotosData.length){
+      // hanya ambil posts yang benar-benar foto (bukan video)
+      _allP.forEach(function(p){
+        if(p.media_type==='video'||p.video_url)return; // skip video
+        if(!p.image_url&&!(p.image_urls&&p.image_urls.length))return;
+        var imgs=p.image_urls&&p.image_urls.length?p.image_urls:[p.image_url];
+        imgs.forEach(function(u){
+          if(u&&_fbPhotosData.length<10){
+            _fbPhotosData.push({
+              image_url:u,photo_page:p.post_url||'',
+              caption:(p.content||'').substring(0,80),
+              album:'Timeline',likes:p.likes||0,date:p.created_at||'',
+            });
+          }
+        });
+      });
+    }
+    var _fbPhotos=_fbPhotosData.slice(0,10);
+    var _fbUC=(C||[]).slice(0,10);
+    // Posts = HANYA posts yang BUKAN reel (sudah dipisah di backend)
+    var _fbPosts=_allP.slice(0,10);
+
+    // Debug
+    console.log('[FB] Posts:',_fbPosts.length,'Reels:',_fbReels.length,
+                'Mentions:',_fbMentions.length,'Photos:',_fbPhotos.length,'UC:',_fbUC.length);
+
+    // Update counts
+    document.getElementById('cnt-posts').textContent       = _fbPosts.length;
+    document.getElementById('cnt-fb-reels').textContent    = _fbReels.length;
+    document.getElementById('cnt-fb-mentions').textContent = _fbMentions.length;
+    document.getElementById('cnt-fb-photos').textContent   = _fbPhotos.length;
+    document.getElementById('cnt-fb-uc').textContent       = _fbUC.length;
+    document.getElementById('cnt-fb-channels').textContent = '0';
+
+    // Render semua tab
+    renderFBPosts();
+    renderFBAbout();
+    renderFBChannels();
+    renderFBMentions(_fbMentions);
+    renderFBReels(_fbReels);
+    renderFBPhotos(_fbPhotos);
+    renderFBUserComments(_fbUC);
+
+  } else {
+    // ── Non-X non-FB platform (TikTok, Instagram, LinkedIn) ──────────
+    // Sembunyikan semua FB-specific tabs
+    ['tbtn-fb-about','tbtn-fb-channels','tbtn-fb-mentions',
+     'tbtn-fb-reels','tbtn-fb-photos','tbtn-fb-uc'].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.style.display='none';
+    });
+    // Tampilkan kembali reposts tab (semua platform non-X non-FB)
+    var _tr=document.getElementById('tbtn-reposts');if(_tr)_tr.style.display='';
+    document.getElementById('cnt-posts').textContent    = P.length;
+    document.getElementById('cnt-reposts').textContent  = R.length;
+    document.getElementById('cnt-comments').textContent = C.length;
+    renderPosts();renderComments();renderReposts();
+  }
+  var bsa=document.getElementById('btn-show-all');if(bsa&&P.length>5)bsa.style.display='';
+}
+function renderProfileHeader(){
+  var p=PRF;var pic=p.profile_pic||'';
+  var name=p.full_name||p.username||'--';var h='@'+(p.username||'');
+  var flw=fmt(p.followers||0);var fwg=fmt(p.following||0);var pts=fmt(p.total_posts||0);
+  var lk=fmt(p.likes||p.total_likes||0);
+  var risk=INS.risk_score||0;var rclr=riskColor(risk);var rlbl=riskLbl(risk);
+  var isFBH=(PLT==='facebook');
+  var html='';
+
+  if(isFBH){
+    // ── Facebook profile — modern card dengan cover + info row ─────────
+    var cover=p.cover_photo||'';
+    var picSrcFB=pic||'';
+    var pgLk=fmt(p.page_likes||0);
+    var cats=(p.categories||[]).slice(0,2).join(' · ');
+
+    html='<div style="border-radius:14px;overflow:hidden;background:var(--card);border:1px solid var(--border);margin-bottom:0">';
+    // Cover photo
+    if(cover){
+      html+='<div style="width:100%;height:160px;overflow:hidden;position:relative">'
+        +'<img src="'+esc(cover)+'" style="width:100%;height:100%;object-fit:cover;display:block" '
+        +'onerror="this.parentElement.style.background=\'#1a2035\'">'
+        +'<div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.6))"></div>'
+        +'</div>';
+    } else {
+      html+='<div style="width:100%;height:80px;background:linear-gradient(135deg,#1877f2,#0d47a1)"></div>';
+    }
+    // Profile row
+    html+='<div style="display:flex;align-items:flex-end;gap:16px;padding:0 20px 16px;margin-top:-36px">';
+    // Avatar
+    html+='<div style="position:relative;flex-shrink:0">';
+    if(picSrcFB){
+      html+='<img src="'+esc(picSrcFB)+'" style="width:80px;height:80px;border-radius:50%;'
+        +'object-fit:cover;border:4px solid var(--card);display:block;background:#1a2035" '
+        +'onerror="this.outerHTML=\'<div style=&quot;width:80px;height:80px;border-radius:50%;background:#1a2035;border:4px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:32px&quot;>&#128100;</div>\'" '
+        +'crossorigin="anonymous">';
+    } else {
+      html+='<div style="width:80px;height:80px;border-radius:50%;background:#1a2035;border:4px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:32px">&#128100;</div>';
+    }
+    html+='</div>';
+    // Name + meta
+    html+='<div style="flex:1;padding-bottom:4px">';
+    html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+    html+='<span style="font-size:20px;font-weight:800;color:var(--text)">'+esc(name)+'</span>';
+    if(p.verified) html+='<span style="background:#1877f2;color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px">&#10003; VERIFIED</span>';
+    html+='<span style="background:rgba(24,119,242,.15);color:#1877f2;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px">&#128101; FACEBOOK</span>';
+    html+='<span style="background:'+(risk>=70?'rgba(248,113,113,.15)':risk>=40?'rgba(245,158,11,.15)':'rgba(0,212,170,.12)')+';'
+      +'color:'+(risk>=70?'#f87171':risk>=40?'#f59e0b':'#00d4aa')+';font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px">'
+      +rlbl+': '+risk+'/100</span>';
+    html+='</div>';
+    if(h&&h!=='@') html+='<div style="font-size:12px;color:#64748b;margin-top:2px">'+esc(h)+'</div>';
+    if(cats) html+='<div style="font-size:11px;color:#1877f2;margin-top:2px">'+esc(cats)+'</div>';
+    html+='</div>';
+    html+='</div>';
+    // Stats bar
+    html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border)">';
+    var _stats=[
+      [flw,'Followers','&#128101;'],
+      [pgLk,'Page Likes','&#128077;'],
+      [pts,'Posts','&#128221;'],
+      [lk||fmt(INS.total_likes||0)||'0','Total Likes','&#10084;'],
+    ];
+    _stats.forEach(function(s,si){
+      html+='<div style="padding:12px 8px;text-align:center'+(si<3?';border-right:1px solid var(--border)':'')+'">';
+      html+='<div style="font-size:16px;font-weight:800;color:var(--text)">'+s[0]+'</div>';
+      html+='<div style="font-size:9px;color:#64748b;margin-top:2px">'+s[2]+' '+s[1]+'</div>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+
+  } else {
+    // ── Non-Facebook profile (TikTok, Instagram, X, etc.) ─────────────
+    var picSrc = pic ? (PLT==='tiktok' ? pic : proxyImg(pic)) : '';
+    html=picSrc
+      ?'<img class="profile-avatar" src="'+esc(picSrc)+'" onerror="this.outerHTML=\'<div class=&quot;profile-avatar&quot;>&#128100;</div>\'" crossorigin="anonymous"/>'
+      :'<div class="profile-avatar">&#128100;</div>';
+    html+='<div class="profile-info">';
+    html+='<div class="profile-name">'+esc(name)+'</div>';
+    html+='<div class="profile-handle">'+esc(h)+'</div>';
+    html+='<div class="profile-badges">';
+    if(p.verified)html+='<span class="badge badge-verified">&#10003; VERIFIED</span>';
+    html+='<span class="badge badge-platform">'+PLT.toUpperCase()+'</span>';
+    html+='<span class="badge '+( risk>=70?'badge-risk-high':risk>=40?'badge-risk-med':'badge-risk-low')+'">'+rlbl+': '+risk+'/100</span>';
+    html+='</div></div>';
+    html+='<div class="profile-meta">';
+    html+='<div class="profile-meta-item"><div class="profile-meta-val">'+flw+'</div><div class="profile-meta-lbl">Followers</div></div>';
+    html+='<div class="profile-meta-item"><div class="profile-meta-val">'+fwg+'</div><div class="profile-meta-lbl">Following</div></div>';
+    html+='<div class="profile-meta-item"><div class="profile-meta-val">'+pts+'</div><div class="profile-meta-lbl">Posts</div></div>';
+    if(lk!=='0')html+='<div class="profile-meta-item"><div class="profile-meta-val">'+lk+'</div><div class="profile-meta-lbl">Total Likes</div></div>';
+    html+='</div>';
+  }
+  document.getElementById('profileHeader').innerHTML=html;
+}
+function renderProfileInfo(){
+  var p=PRF;var bio=esc((p.bio||p.about||'').substring(0,150));
+  var now=new Date().toLocaleDateString('id-ID',{year:'numeric',month:'short',day:'2-digit'});
+  var isX=(PLT==='x'||PLT==='twitter');
+  var isFB=(PLT==='facebook');
+  var html='';
+  // Facebook — handle di blok khusus di bawah, skip default rendering
+  if(!isFB){
+    if(bio)html+='<div style="font-size:11px;color:#94a3b8;line-height:1.6;margin-bottom:10px">'+bio+'</div>';
+    html+='<div class="info-row"><span class="info-lbl">Platform</span><span class="info-val">'+(isX?'<span style="color:#1d9bf0;font-weight:700">&#128038; X / Twitter</span>':PLT.toUpperCase())+'</span></div>';
+    html+='<div class="info-row"><span class="info-lbl">Scan Date</span><span class="info-val">'+now+'</span></div>';
+    html+='<div class="info-row"><span class="info-lbl">Verified</span><span class="info-val">'+(p.verified?'<span style="color:'+(isX?'#1d9bf0':'var(--green)')+'">&#10003; '+(isX?'Blue Check':'Yes')+'</span>':'<span style="color:var(--muted)">No</span>')+'</span></div>';
+    html+='<div class="info-row"><span class="info-lbl">Posts Analyzed</span><span class="info-val">'+P.length+'</span></div>';
+    if(isX){
+      if(p.join_date) html+='<div class="info-row"><span class="info-lbl">Joined</span><span class="info-val">'+esc(p.join_date)+'</span></div>';
+      if(p.location)  html+='<div class="info-row"><span class="info-lbl">Location</span><span class="info-val">&#128205; '+esc(p.location)+'</span></div>';
+      if(p.website)   html+='<div class="info-row"><span class="info-lbl">Website</span><span class="info-val"><a href="'+esc(p.website)+'" target="_blank" style="color:#1d9bf0">'+esc(p.website.substring(0,35))+'</a></span></div>';
+      if(p.tweet_count) html+='<div class="info-row"><span class="info-lbl">Total Tweets</span><span class="info-val">'+fmt(p.tweet_count)+'</span></div>';
+      var bm=XBM||{};
+      if(bm.tweet_types_breakdown){
+        var td=bm.tweet_types_breakdown||{};
+        html+='<div class="info-row"><span class="info-lbl">Tweet Types</span><span class="info-val" style="display:flex;gap:5px;flex-wrap:wrap">';
+        if(td.POST)    html+='<span style="font-size:9px;background:rgba(29,155,240,.1);color:#1d9bf0;padding:1px 6px;border-radius:4px">&#128221; '+td.POST+'</span>';
+        if(td.REPLY)   html+='<span style="font-size:9px;background:rgba(0,186,124,.1);color:#00ba7c;padding:1px 6px;border-radius:4px">&#128172; '+td.REPLY+'</span>';
+        if(td.RETWEET) html+='<span style="font-size:9px;background:rgba(139,92,246,.1);color:#8b5cf6;padding:1px 6px;border-radius:4px">&#128260; '+td.RETWEET+'</span>';
+        if(td.QUOTE)   html+='<span style="font-size:9px;background:rgba(245,158,11,.1);color:#f59e0b;padding:1px 6px;border-radius:4px">&#10077; '+td.QUOTE+'</span>';
+        html+='</span></div>';
+      }
+      if((bm.top_hashtags||[]).length){
+        html+='<div class="info-row"><span class="info-lbl">Top Hashtags</span><span class="info-val" style="font-size:10px;color:#1d9bf0">'+(bm.top_hashtags||[]).slice(0,5).map(function(h){return'#'+esc(h);}).join(' ')+'</span></div>';
+      }
+    }
+  } // end if(!isFB)
+  // ── Facebook-specific fields ────────────────────────────────────────
+  if(isFB){
+    html+='<div class="info-row"><span class="info-lbl">Platform</span><span class="info-val"><span style="color:#1877f2;font-weight:700">&#128101; Facebook</span></span></div>';
+    html+='<div class="info-row"><span class="info-lbl">Scan Date</span><span class="info-val">'+new Date().toLocaleDateString('id-ID',{year:'numeric',month:'short',day:'2-digit'})+'</span></div>';
+    html+='<div class="info-row"><span class="info-lbl">Verified</span><span class="info-val">'+(p.verified?'<span style="color:#1877f2">&#10003; Yes</span>':'<span style="color:var(--muted)">No</span>')+'</span></div>';
+    html+='<div class="info-row"><span class="info-lbl">Posts Analyzed</span><span class="info-val">'+P.length+'</span></div>';
+    if(p.page_likes) html+='<div class="info-row"><span class="info-lbl">Page Likes</span><span class="info-val">'+fmt(p.page_likes)+'</span></div>';
+    if(p.join_date)  html+='<div class="info-row"><span class="info-lbl">Created</span><span class="info-val">'+esc(p.join_date)+'</span></div>';
+    if(p.location||p.address) html+='<div class="info-row"><span class="info-lbl">Location</span><span class="info-val">&#128205; '+esc(p.location||p.address)+'</span></div>';
+    if(p.website)    html+='<div class="info-row"><span class="info-lbl">Website</span><span class="info-val"><a href="'+esc(p.website)+'" target="_blank" style="color:#1877f2">'+esc(p.website.substring(0,35))+'</a></span></div>';
+    if(p.email)      html+='<div class="info-row"><span class="info-lbl">Email</span><span class="info-val">'+esc(p.email)+'</span></div>';
+    if(p.phone)      html+='<div class="info-row"><span class="info-lbl">Phone</span><span class="info-val">'+esc(p.phone)+'</span></div>';
+    if(p.rating)     html+='<div class="info-row"><span class="info-lbl">Rating</span><span class="info-val">&#11088; '+esc(p.rating)+'</span></div>';
+    if((p.categories||[]).length) html+='<div class="info-row"><span class="info-lbl">Categories</span><span class="info-val" style="font-size:10px">'+(p.categories||[]).slice(0,3).map(function(c){return'<span style="background:rgba(24,119,242,.1);color:#1877f2;padding:1px 6px;border-radius:4px;margin-right:3px">'+esc(c)+'</span>';}).join('')+'</span></div>';
+    if(p.about_me)   html+='<div style="font-size:10px;color:#94a3b8;margin-top:6px;line-height:1.5">'+esc(p.about_me.substring(0,200))+'</div>';
+  }
+  document.getElementById('profileInfoCard').innerHTML='<div class="card-title"><span class="card-title-icon">&#128100;</span>Profile Information</div>'+html;
+}
+function renderRisk(){
+  var risk=INS.risk_score||0;var rclr=riskColor(risk);var rlbl=riskLbl(risk);var rec=INS.recommendation||'';
+  var arcEnd=Math.min(risk/100,1);
+  var cx=60,cy=60,rad=50;
+  var startA=Math.PI;var endA=startA+arcEnd*Math.PI;
+  var x1=cx+rad*Math.cos(startA);var y1=cy+rad*Math.sin(startA);
+  var x2=cx+rad*Math.cos(endA);var y2=cy+rad*Math.sin(endA);
+  var laf=arcEnd>0.5?1:0;
+  var svg='<svg viewBox="10 10 100 60" width="120" height="70">'
+    +'<path d="M10 60 A50 50 0 0 1 110 60" fill="none" stroke="#1e2840" stroke-width="10" stroke-linecap="round"/>'
+    +(arcEnd>0?'<path d="M'+x1.toFixed(1)+' '+y1.toFixed(1)+' A'+rad+' '+rad+' 0 '+laf+' 1 '+x2.toFixed(1)+' '+y2.toFixed(1)+'" fill="none" stroke="'+rclr+'" stroke-width="10" stroke-linecap="round"/>':'')
+    +'</svg>';
+  var html='<div style="position:relative;width:120px;height:70px;margin:0 auto 6px">'
+    +svg
+    +'<div class="risk-score-num" style="color:'+rclr+'">'+risk+'</div>'
+    +'</div>';
+  html+='<div style="text-align:center"><span class="risk-level-badge" style="background:'+rclr+'18;color:'+rclr+'">'+rlbl+'</span></div>';
+  if(rec)html+='<div style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center">'+esc(rec.substring(0,60))+'</div>';
+  document.getElementById('riskCard').innerHTML='<div class="card-title"><span class="card-title-icon">&#9888;&#65039;</span>Risk Assessment</div>'+html;
+}
+function renderSentiment(){
+  var ins=INS;var bd=ins.sentiment_breakdown||{};
+  var pos=pct(bd.POSITIVE||0);var neg=pct(bd.NEGATIVE||0);var neu=pct(bd.NEUTRAL||0);
+  var over=ins.sentiment_overall||'NEUTRAL';var oClr=sentColor(over);
+  var html='<div style="font-size:11px;font-weight:800;margin-bottom:8px">OVERALL: <span style="color:'+oClr+'">'+over+'</span></div>';
+  html+='<div class="sent-bar-row"><span class="sent-bar-lbl" style="color:#00d4aa">Pos</span><div class="sent-bar-bg"><div class="sent-bar-fill" style="width:'+pos+'%;background:#00d4aa"></div></div><span class="sent-bar-pct" style="color:#00d4aa">'+pos+'%</span></div>';
+  html+='<div class="sent-bar-row"><span class="sent-bar-lbl" style="color:#f87171">Neg</span><div class="sent-bar-bg"><div class="sent-bar-fill" style="width:'+neg+'%;background:#f87171"></div></div><span class="sent-bar-pct" style="color:#f87171">'+neg+'%</span></div>';
+  html+='<div class="sent-bar-row"><span class="sent-bar-lbl" style="color:#4a5568">Neu</span><div class="sent-bar-bg"><div class="sent-bar-fill" style="width:'+neu+'%;background:#4a5568"></div></div><span class="sent-bar-pct" style="color:#4a5568">'+neu+'%</span></div>';
+  var cov=ins.comment_sentiment_overall||'N/A';var cbd=ins.comment_sentiment_breakdown||{};
+  var cpos=pct(cbd.POSITIVE||0);var cneg=pct(cbd.NEGATIVE||0);var cneu=pct(cbd.NEUTRAL||0);
+  html+='<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)"><div class="card-subtitle">Comment Sentiment</div>';
+  html+='<div class="sent-bar-row"><span class="sent-bar-lbl" style="color:#00d4aa">Pos</span><div class="sent-bar-bg"><div class="sent-bar-fill" style="width:'+cpos+'%;background:#00d4aa"></div></div><span class="sent-bar-pct" style="color:#00d4aa">'+cpos+'%</span></div>';
+  html+='<div class="sent-bar-row"><span class="sent-bar-lbl" style="color:#f87171">Neg</span><div class="sent-bar-bg"><div class="sent-bar-fill" style="width:'+cneg+'%;background:#f87171"></div></div><span class="sent-bar-pct" style="color:#f87171">'+cneg+'%</span></div>';
+  html+='<div class="sent-bar-row"><span class="sent-bar-lbl" style="color:#4a5568">Neu</span><div class="sent-bar-bg"><div class="sent-bar-fill" style="width:'+cneu+'%;background:#4a5568"></div></div><span class="sent-bar-pct" style="color:#4a5568">'+cneu+'%</span></div></div>';
+  document.getElementById('sentimentCard').innerHTML='<div class="card-title"><span class="card-title-icon">&#128200;</span>Sentiment Analysis</div>'+html;
+}
+function renderEngagement(){
+  var n=Math.max(P.length,1);
+  var totalL=P.reduce(function(s,p){return s+(p.likes||0);},0);
+  var totalV=P.reduce(function(s,p){return s+(p.views||p.plays||0);},0);
+  var totalC=P.reduce(function(s,p){return s+(p.comments||0);},0);
+  var totalS=P.reduce(function(s,p){return s+(p.shares||0);},0);
+  var avgL=Math.round(totalL/n);var avgV=Math.round(totalV/n);
+  var engRate=avgV>0?((avgL/avgV)*100).toFixed(2):0;
+  var flw=PRF.followers||0;
+  var html='<div class="stat-row"><div class="stat-icon" style="background:rgba(0,212,170,.1)">&#128100;</div><div><div class="stat-big">'+fmt(flw)+'</div><div class="stat-lbl">Followers</div></div></div>';
+  html+='<div class="stat-row"><div class="stat-icon" style="background:rgba(248,113,113,.1)">&#10084;</div><div><div class="stat-val">'+fmt(avgL)+'</div><div class="stat-lbl">Avg Likes / Post</div></div></div>';
+  html+='<div style="font-size:20px;font-weight:900;color:var(--accent);margin:4px 0">'+engRate+'%<span style="font-size:11px;color:var(--muted);font-weight:400"> engagement rate</span></div>';
+  var maxV=Math.max(totalL,totalV,totalC,totalS,1);
+  var bars=[{l:'Likes',v:totalL,c:'#f87171'},{l:'Views',v:totalV,c:'#3b82f6'},{l:'Comments',v:totalC,c:'#f59e0b'},{l:'Shares',v:totalS,c:'#a855f7'}];
+  html+='<div class="engagement-bar-wrap">';
+  bars.forEach(function(b){html+='<div class="eng-bar-row"><span class="eng-bar-lbl">'+b.l+'</span><div class="eng-bar-bg"><div class="eng-bar-fill" style="width:'+Math.round(b.v/Math.max(totalV,totalL,1)*100)+'%;background:'+b.c+'"></div></div><span class="eng-bar-val" style="color:'+b.c+'">'+fmt(b.v)+'</span></div>';});
+  html+='</div>';
+  document.getElementById('engagementCard').innerHTML='<div class="card-title"><span class="card-title-icon">&#128293;</span>Engagement Analysis</div>'+html;
+}
+function renderPosting(){
+  var n=P.length;var avgC=0;var avgL=0;
+  if(n>0){avgC=Math.round(P.reduce(function(s,p){return s+(p.comments||0);},0)/n);avgL=Math.round(P.reduce(function(s,p){return s+(p.likes||0);},0)/n);}
+  var html='<div style="display:flex;gap:20px;margin-bottom:10px">';
+  html+='<div><div style="font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase">TOTAL POSTS</div><div style="font-size:26px;font-weight:900;color:#fff">'+n+'</div></div>';
+  html+='<div><div style="font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase">ANALYZED</div><div style="font-size:26px;font-weight:900;color:var(--accent)">'+n+' posts</div></div>';
+  html+='</div>';
+  html+='<div class="info-row"><span class="info-lbl">Platform</span><span class="info-val" style="color:var(--accent)">'+PLT.toUpperCase()+'</span></div>';
+  html+='<div class="info-row"><span class="info-lbl">Avg Comments</span><span class="info-val">'+fmt(avgC)+'</span></div>';
+  html+='<div class="info-row"><span class="info-lbl">Avg Likes</span><span class="info-val">'+fmt(avgL)+'</span></div>';
+  // Instagram: tampilkan media type breakdown
+  if(PLT==='instagram'&&n>0){
+    var imgC=P.filter(function(p){return(p.media_type||'image')==='image';}).length;
+    var carC=P.filter(function(p){return(p.media_type||'')==='carousel';}).length;
+    var vidC=P.filter(function(p){return(p.media_type||'')==='video';}).length;
+    html+='<div class="info-row"><span class="info-lbl">Foto</span><span class="info-val">'+imgC+'</span></div>';
+    if(carC)html+='<div class="info-row"><span class="info-lbl">Carousel</span><span class="info-val">'+carC+'</span></div>';
+    if(vidC)html+='<div class="info-row"><span class="info-lbl">Reel/Video</span><span class="info-val">'+vidC+'</span></div>';
+  }
+  document.getElementById('postingCard').innerHTML='<div class="card-title"><span class="card-title-icon">&#128221;</span>Posting Activity</div>'+html;
+}
+function renderHashtags(){
+  var freq={};
+  P.forEach(function(p){
+    // Dari field hashtags (array of strings)
+    (p.hashtags||[]).forEach(function(h){
+      var k=String(h||'').toLowerCase().replace(/[^a-z0-9_]/g,'');
+      if(k&&k.length>1)freq[k]=(freq[k]||0)+1;
+    });
+    // Fallback: parse dari caption langsung (untuk IG yang hashtags field kosong)
+    var cap=p.caption||p.content||p.text||'';
+    var hFromCap=cap.match(/#(\w+)/g)||[];
+    hFromCap.forEach(function(h){
+      var k=h.replace('#','').toLowerCase();
+      if(k&&k.length>1&&!freq[k])freq[k]=(freq[k]||0)+1;
+    });
+  });
+  var sorted=Object.entries(freq).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
+  var maxF=sorted.length>0?sorted[0][1]:1;
+  var colors=['#00d4aa','#3b82f6','#a855f7','#f59e0b','#f87171','#06b6d4'];
+  var html='<div class="card-subtitle">TOP USED HASHTAGS</div><div class="htag-cloud">';
+  if(sorted.length>0){sorted.forEach(function(e,i){var clr=colors[i%colors.length];var size=9+Math.round((e[1]/maxF)*4);html+='<span class="htag" style="background:'+clr+'18;color:'+clr+';border:1px solid '+clr+'30;font-size:'+size+'px">#'+esc(e[0])+'</span>';});}else{html+='<span style="color:var(--muted);font-size:11px">No hashtags found</span>';}
+  html+='</div>';
+  document.getElementById('hashtagCard').innerHTML='<div class="card-title"><span class="card-title-icon">&#127991;&#65039;</span>Hashtag Analysis</div>'+html;
+}
+function renderKeywords(){
+  var topics={};
+  P.forEach(function(p){var t=p.topic||'';if(t&&t!=='umum')topics[t]=(topics[t]||0)+1;});
+  var topList=Object.entries(topics).sort(function(a,b){return b[1]-a[1];}).slice(0,6);
+  var doms=INS.dominant_topics||[];
+  var html='<div class="card-subtitle">DETECTED TOPICS</div><div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">';
+  if(topList.length>0){topList.forEach(function(t){html+='<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,.15);color:#3b82f6;border:1px solid rgba(59,130,246,.3);font-weight:600">'+esc(t[0])+'</span>';});}else{html+='<span style="color:var(--muted);font-size:11px">No topics detected</span>';}
+  html+='</div>';
+  html+='<div class="card-subtitle">FLAGGED TOPICS</div><div style="display:flex;flex-wrap:wrap;gap:5px">';
+  var flagged=(INS.red_flags||[]).slice(0,3);
+  if(flagged.length>0){flagged.forEach(function(f){html+='<span style="font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.2);font-weight:700">'+esc(String(f).replace(/[&#128680;&#9888;&#65039;&#10003;]/g,'').trim().substring(0,40))+'</span>';});}else{html+='<span style="color:var(--muted);font-size:10px">No topics flagged</span>';}
+  html+='</div>';
+  document.getElementById('keywordsCard').innerHTML='<div class="card-title"><span class="card-title-icon">&#128273;</span>Keywords &amp; Topics</div>'+html;
+}
+function renderBehavioral(){
+  var rf=INS.red_flags||[];var gf=INS.green_flags||[];
+  var html='<div class="card-subtitle">&#128681; Red Flags ('+rf.length+')</div>';
+  if(rf.length>0){html+='<div style="margin-bottom:8px">';rf.slice(0,4).forEach(function(f){html+='<div class="flag-item flag-red"><span>&#9873;</span><span style="font-size:10px">'+esc(String(f).replace(/[&#128680;&#9888;&#65039;&#10003;]/g,'').trim())+'</span></div>';});html+='</div>';}else{html+='<div style="font-size:10px;color:var(--muted);margin-bottom:8px">No risk patterns flagged</div>';}
+  html+='<div class="card-subtitle">&#10003; Trust Markers ('+gf.length+')</div>';
+  if(gf.length>0){gf.slice(0,3).forEach(function(f){html+='<div class="flag-item flag-green"><span>&#10003;</span><span style="font-size:10px">'+esc(String(f).replace(/[&#128680;&#9888;&#65039;&#10003;]/g,'').trim())+'</span></div>';});}else{html+='<div style="font-size:10px;color:var(--muted)">No trust markers</div>';}
+  var rec=INS.recommendation||'';
+  if(rec)html+='<div style="margin-top:8px;font-size:10px;color:var(--accent);font-weight:700;padding:5px 8px;background:rgba(0,212,170,.08);border-radius:6px;border:1px solid rgba(0,212,170,.15)">'+esc(rec)+'</div>';
+  document.getElementById('behavioralCard').innerHTML='<div class="card-title"><span class="card-title-icon">&#129504;</span>Behavioral Analysis</div>'+html;
+}
+function renderAISummary(){
+  var short=INS.ai_narrative_short||INS.summary_text||'';
+  var full=INS.ai_narrative||'';
+  var risk=INS.risk_score||0;var rclr=riskColor(risk);
+  var bd=INS.sentiment_breakdown||{};
+  var pos=pct(bd.POSITIVE||0);var neg=pct(bd.NEGATIVE||0);var neu=pct(bd.NEUTRAL||0);
+  var rec=INS.recommendation||'';
+  var name=PRF.full_name||PRF.username||'Target';
+  function fmtBold(t){if(!t)return'';return t.replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#fff">$1</strong>');}
+
+  // Verdict config
+  var vIcon,vClr,vGrad;
+  if(rec.includes('SANGAT')){vIcon='&#11088;';vClr='#00d4aa';vGrad='linear-gradient(135deg,rgba(0,212,170,.15),rgba(0,212,170,.05))';}
+  else if(rec.includes('DIREKOMENDASIKAN')&&!rec.includes('TIDAK')){vIcon='&#10003;';vClr='#3b82f6';vGrad='linear-gradient(135deg,rgba(59,130,246,.15),rgba(59,130,246,.05))';}
+  else if(rec.includes('PERTIMBANGKAN')){vIcon='&#9889;';vClr='#f59e0b';vGrad='linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05))';}
+  else{vIcon='&#9888;';vClr='#f87171';vGrad='linear-gradient(135deg,rgba(248,113,113,.15),rgba(248,113,113,.05))';}
+
+  var html='';
+  html+='<div style="background:'+vGrad+';border:1px solid '+vClr+'25;border-radius:12px;overflow:hidden">';
+
+  // ── Header strip ─────────────────────────────────────────────────────
+  html+='<div style="background:'+vClr+'18;border-bottom:1px solid '+vClr+'20;padding:10px 16px;display:flex;align-items:center;gap:10px">';
+  html+='<span style="font-size:20px">'+vIcon+'</span>';
+  html+='<div>';
+  html+='<div style="font-size:10px;font-weight:900;color:'+vClr+';text-transform:uppercase;letter-spacing:.1em">AI Intelligence Summary</div>';
+  html+='<div style="font-size:9px;color:var(--muted);margin-top:1px">Analisis mendalam profil digital @'+(PRF.username||'target')+'</div>';
+  html+='</div>';
+  html+='<div style="margin-left:auto;text-align:right">';
+  html+='<div style="font-size:11px;font-weight:800;color:'+vClr+'">'+esc(rec||'DALAM ANALISIS')+'</div>';
+  html+='</div>';
+  html+='</div>';
+
+  // ── Body ─────────────────────────────────────────────────────────────
+  html+='<div style="padding:14px 16px">';
+
+  // Short narrative — tampilkan langsung, tebal dan jelas
+  if(short){
+    html+='<div style="font-size:13px;color:#d4dbe8;line-height:1.85;margin-bottom:14px;border-left:3px solid '+vClr+';padding-left:12px">';
+    html+=fmtBold(esc(short));
+    html+='</div>';
+  }
+
+  // ── Stats strip ───────────────────────────────────────────────────────
+  html+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">';
+  // Positif
+  html+='<div style="background:#080c14;border:1px solid #1e2840;border-radius:8px;padding:8px;text-align:center">';
+  html+='<div style="font-size:18px;font-weight:900;color:#00d4aa">'+pos+'%</div><div style="font-size:8px;color:var(--muted);text-transform:uppercase">Positif</div></div>';
+  // Negatif
+  html+='<div style="background:#080c14;border:1px solid #1e2840;border-radius:8px;padding:8px;text-align:center">';
+  html+='<div style="font-size:18px;font-weight:900;color:#f87171">'+neg+'%</div><div style="font-size:8px;color:var(--muted);text-transform:uppercase">Negatif</div></div>';
+  // Netral
+  html+='<div style="background:#080c14;border:1px solid #1e2840;border-radius:8px;padding:8px;text-align:center">';
+  html+='<div style="font-size:18px;font-weight:900;color:#4a5568">'+neu+'%</div><div style="font-size:8px;color:var(--muted);text-transform:uppercase">Netral</div></div>';
+  // Risk
+  html+='<div style="background:#080c14;border:1px solid #1e2840;border-radius:8px;padding:8px;text-align:center">';
+  html+='<div style="font-size:18px;font-weight:900;color:'+rclr+'">'+risk+'</div><div style="font-size:8px;color:var(--muted);text-transform:uppercase">Risk/100</div></div>';
+  // Posts
+  html+='<div style="background:#080c14;border:1px solid #1e2840;border-radius:8px;padding:8px;text-align:center">';
+  html+='<div style="font-size:18px;font-weight:900;color:#94a3b8">'+P.length+'</div><div style="font-size:8px;color:var(--muted);text-transform:uppercase">Posts</div></div>';
+  html+='</div>';
+
+  // ── Suitable roles ────────────────────────────────────────────────────
+  if(INS.suitable_roles&&INS.suitable_roles.length>0){
+    html+='<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+    html+='<span style="font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;white-space:nowrap">Cocok untuk:</span>';
+    INS.suitable_roles.slice(0,4).forEach(function(r){
+      html+='<span style="font-size:9px;padding:2px 8px;border-radius:20px;background:'+vClr+'15;color:'+vClr+';border:1px solid '+vClr+'30;font-weight:700">'+esc(r)+'</span>';
+    });
+    html+='</div>';
+  }
+
+  // ── Expand full narrative ─────────────────────────────────────────────
+  if(full){
+    html+='<div onclick="toggleFullNarrative()" id="narrative-toggle-btn" style="cursor:pointer;font-size:10px;color:'+vClr+';font-weight:700;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;background:'+vClr+'10;border:1px solid '+vClr+'25;border-radius:20px;transition:all .2s">';
+    html+='&#128269; Baca Analisis Lengkap (6 Bagian)</div>';
+    html+='<div id="narrative-full-panel" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #1e2840">';
+    // Parse paragraf dan tampilkan dengan timeline style
+    var paras=full.split('\n\n').filter(function(p){return p.trim();});
+    var paraIcons=['&#128100;','&#127897;&#65039;','&#129300;','&#128683;','&#129504;','&#127942;'];
+    paras.forEach(function(p,i){
+      html+='<div style="display:flex;gap:10px;margin-bottom:12px">';
+      html+='<div style="width:24px;height:24px;border-radius:50%;background:'+vClr+'20;border:1px solid '+vClr+'30;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:2px">'+(paraIcons[i]||'&#9679;')+'</div>';
+      html+='<div style="flex:1;font-size:11px;color:#94a3b8;line-height:1.75">'+fmtBold(esc(p.trim()))+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+
+  html+='</div>'; // end body
+  html+='</div>'; // end outer
+
+  document.getElementById('aiSummaryCard').innerHTML=html;
+}
+function renderTopicDetection(){
+  var card=document.getElementById('topicDetectionCard');if(!card)return;
+  if(!P.length){card.innerHTML='';return;}
+  var topicCount={};var total=P.length;
+  P.forEach(function(p){
+    var t=p.topic||p.category||'';
+    if(t&&t!=='umum'&&t!=='Konten Kreatif'){topicCount[t]=(topicCount[t]||0)+1;}
+  });
+  var sorted=Object.entries(topicCount).sort(function(a,b){return b[1]-a[1];});
+  if(!sorted.length){card.innerHTML='';return;}
+  var maxC=sorted[0][1];
+  var colors=['#00d4aa','#3b82f6','#a855f7','#f59e0b','#f87171','#06b6d4','#22c55e','#fb923c'];
+  var html='';
+  html+='<div style="background:#0f1420;border:1px solid #1e2840;border-radius:12px;padding:16px 20px">';
+  html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">';
+  html+='<div style="width:32px;height:32px;border-radius:8px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);display:flex;align-items:center;justify-content:center;font-size:15px">&#127358;</div>';
+  html+='<div>';
+  html+='<div style="font-size:11px;font-weight:900;color:#fff;letter-spacing:.03em">Topic Detection</div>';
+  html+='<div style="font-size:9px;color:var(--muted);margin-top:1px">Konten yang paling sering dibahas dari '+total+' postingan terakhir</div>';
+  html+='</div>';
+  html+='<div style="margin-left:auto"><span style="font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(0,212,170,.1);color:#00d4aa;font-weight:700;border:1px solid rgba(0,212,170,.2)">'+sorted.length+' TOPIK</span></div>';
+  html+='</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:10px">';
+  sorted.slice(0,8).forEach(function(e,i){
+    var topic=e[0];var count=e[1];
+    var pct=Math.round((count/total)*100);
+    var clr=colors[i%colors.length];
+    var barW=Math.round((count/maxC)*100);
+    html+='<div style="display:flex;align-items:center;gap:10px">';
+    html+='<div style="width:22px;height:22px;border-radius:6px;background:'+clr+'20;border:1px solid '+clr+'30;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:'+clr+';flex-shrink:0">'+(i+1)+'</div>';
+    html+='<div style="flex:1;min-width:0">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">';
+    html+='<span style="font-size:11px;font-weight:700;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">'+esc(topic)+'</span>';
+    html+='<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">';
+    html+='<span style="font-size:10px;font-weight:800;color:'+clr+'">'+pct+'%</span>';
+    html+='<span style="font-size:9px;color:var(--muted)">('+count+' post)</span>';
+    html+='</div>';
+    html+='</div>';
+    html+='<div style="height:5px;background:#1e2840;border-radius:3px;overflow:hidden">';
+    html+='<div style="height:100%;width:'+barW+'%;background:'+clr+';border-radius:3px;transition:width .8s ease"></div>';
+    html+='</div>';
+    html+='</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  if(sorted.length>8){
+    html+='<div style="margin-top:10px;text-align:center;font-size:10px;color:var(--muted)">+'+(sorted.length-8)+' topik lainnya</div>';
+  }
+  html+='</div>';
+  card.innerHTML=html;
+}
+function toggleFullNarrative(){
+  var panel=document.getElementById('narrative-full-panel');
+  var btn=document.getElementById('narrative-toggle-btn');
+  if(panel){if(panel.style.display==='none'){panel.style.display='block';if(btn)btn.innerHTML='&#9650; Collapse AI Analysis';}else{panel.style.display='none';if(btn)btn.innerHTML='&#128269; Expand AI Analysis';}}
+}
+function renderCaption(){
+  var n=P.length;var totalWords=0;var withCap=0;
+  P.forEach(function(p){var cap=p.caption||p.content||p.text||'';if(cap&&cap.length>3){withCap++;totalWords+=cap.split(/\s+/).length;}});
+  var avgW=withCap>0?Math.round(totalWords/withCap):0;
+  var postsWithCap=withCap;var emptyPosts=n-withCap;
+  var capPct=n>0?Math.round(withCap/n*100):0;
+  var html='<div style="display:flex;gap:20px;margin-bottom:10px">';
+  html+='<div><div style="font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase">AVG CAPTION LENGTH</div><div style="font-size:26px;font-weight:900;color:#fff">'+avgW+'<span style="font-size:12px;color:var(--muted);font-weight:400"> words</span></div></div>';
+  html+='<div><div style="font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase">WITHOUT CAPTION</div><div style="font-size:26px;font-weight:900;color:var(--red)">'+emptyPosts+' posts</div></div>';
+  html+='</div>';
+  html+='<div class="info-row"><span class="info-lbl">Caption Rate</span><span class="info-val" style="color:var(--accent)">'+capPct+'%</span></div>';
+  var avgSentScore=0;if(n>0){var ss2=0;P.forEach(function(p){var sent=p.sentiment||{};var score=typeof sent==='object'?sent.score:0.5;ss2+=score;});avgSentScore=Math.round(ss2/n*100);}
+  html+='<div class="info-row"><span class="info-lbl">Avg Sentiment Score</span><span class="info-val">'+avgSentScore+'%</span></div>';
+  document.getElementById('captionCard').innerHTML='<div class="card-title"><span class="card-title-icon">&#128461;</span>Caption Analysis</div>'+html;
+}
+// ── X/TWITTER RENDERING FUNCTIONS ─────────────────────────────────────────
+// Tweet type config (pakai HTML entities, bukan emoji langsung di JS)
+var _XT={
+  'POST':   {icon:'&#128221;',label:'TWEET',     col:'#1d9bf0',bg:'rgba(29,155,240,.12)'},
+  'REPLY':  {icon:'&#128172;',label:'REPLY',     col:'#00ba7c',bg:'rgba(0,186,124,.12)'},
+  'RETWEET':{icon:'&#128260;',label:'RETWEET',   col:'#8b5cf6',bg:'rgba(139,92,246,.12)'},
+  'QUOTE':  {icon:'&#10077;', label:'QUOTE',     col:'#f59e0b',bg:'rgba(245,158,11,.12)'},
+};
+function _xBadge(tt){
+  var t=(tt||'POST').toUpperCase();
+  var c=_XT[t]||_XT['POST'];
+  return '<span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:5px;background:'+c.bg+';color:'+c.col+'">'+c.icon+' '+c.label+'</span>';
+}
+function _xMet(m,opts){
+  var o=opts||{};m=m||{};
+  var h='<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:11px;color:var(--muted)">';
+  if(m.views)   h+='<span>&#128065; <b style="color:var(--text)">'+fmt(m.views)+'</b></span>';
+  if(m.likes)   h+='<span>&#10084; <b style="color:var(--text)">'+fmt(m.likes)+'</b></span>';
+  if(m.retweets)h+='<span>&#128260; <b style="color:var(--text)">'+fmt(m.retweets)+'</b></span>';
+  if(m.replies) h+='<span>&#128172; <b style="color:var(--text)">'+fmt(m.replies)+'</b></span>';
+  if(o.showQ&&m.quotes)h+='<span>&#10077; <b style="color:var(--text)">'+fmt(m.quotes)+'</b></span>';
+  if(o.showB&&m.bookmarks)h+='<span>&#128278; <b style="color:var(--text)">'+fmt(m.bookmarks)+'</b></span>';
+  h+='</div>';return h;
+}
+function _xMedia(p,idx){
+  var med=p.media||{};
+  // Support both nested media object and flat fields
+  var img=med.image_url||p.image_url||'';
+  var vid=med.video_url||p.video_url||'';
+  var gif=med.gif_url||p.gif_url||'';
+  var all=med.all_media||p.all_media||[];
+  var turl=p.tweet_url||p.post_url||'';
+  var h='';
+  if(vid){
+    // Twitter CDN (twimg.com) butuh auth cookie — tidak bisa di-proxy dari server
+    // Langsung tampilkan tombol fallback tanpa mencoba load video
+    var isTwimg=(vid.indexOf('twimg.com')!==-1||vid.indexOf('video.twimg')!==-1||vid.indexOf('ext_tw_video')!==-1||vid.indexOf('tweet_video')!==-1);
+    if(isTwimg){
+      h+='<div style="margin-top:10px;border-radius:10px;background:#0d1117;border:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 16px">';
+      h+='<div style="width:36px;height:36px;border-radius:50%;background:#1d9bf020;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">&#127909;</div>';
+      h+='<div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Video Twitter</div>';
+      if(turl) h+='<a href="'+esc(turl)+'" target="_blank" style="background:#1d9bf0;color:#fff;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;text-decoration:none;display:inline-block">&#9654; Tonton di X/Twitter</a>';
+      h+='</div></div>';
+    } else {
+      // Non-Twitter video — coba proxy dulu, fallback ke tombol
+      var vidProxy='/api/v1/proxy/image?url='+encodeURIComponent(vid);
+      h+='<div style="margin-top:10px;border-radius:10px;overflow:hidden;background:#0d1117;border:1px solid var(--border);position:relative">';
+      h+='<video controls playsinline preload="metadata" style="width:100%;max-height:320px;display:block;background:#000;object-fit:contain" id="xv-'+idx+'" muted '
+        +'onerror="this.style.display=\'none\';var fb=document.getElementById(\'xvfb-'+idx+'\');if(fb)fb.style.display=\'flex\'">';
+      h+='<source src="'+esc(vidProxy)+'" type="video/mp4">';
+      h+='<source src="'+esc(vid)+'" type="video/mp4">';
+      h+='</video>';
+      h+='<div id="xvfb-'+idx+'" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;min-height:160px;background:#0d1117">';
+      if(turl) h+='<a href="'+esc(turl)+'" target="_blank" style="background:#1d9bf0;color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;font-weight:800;text-decoration:none">&#9654; Tonton di X/Twitter</a>';
+      h+='</div>';
+      h+='</div>';
+      h+='<script>setTimeout(function(){var v=document.getElementById("xv-'+idx+'");if(v){v.muted=false;v.volume=1;setTimeout(function(){if(v.readyState<2){v.style.display="none";var fb=document.getElementById("xvfb-'+idx+'");if(fb)fb.style.display="flex";}},1500);}},100);<\/script>';
+    }
+  } else if(gif){
+    h+='<div style="margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid var(--border)">';
+    h+='<img src="'+esc(gif)+'" style="width:100%;max-height:260px;object-fit:cover;display:block" alt="GIF">';
+    h+='</div>';
+  } else if(all.length>1){
+    // Grid untuk multiple images
+    var cols=all.length===2?'1fr 1fr':(all.length===3?'1fr 1fr':'1fr 1fr');
+    h+='<div style="display:grid;grid-template-columns:'+cols+';gap:3px;margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid var(--border)">';
+    all.slice(0,4).forEach(function(mi,mi_i){
+      var u=typeof mi==='string'?mi:(mi.url||mi.image_url||'');
+      if(!u)return;
+      var span=(all.length===3&&mi_i===0)?'grid-column:1/3':'';
+      h+='<div style="'+span+';aspect-ratio:4/3;overflow:hidden">';
+      h+='<img src="'+esc(u)+'" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display=\'none\'">';
+      h+='</div>';
+    });
+    h+='</div>';
+  } else if(img){
+    // Single image — aspect-ratio 16/9 supaya tidak gepeng
+    h+='<div style="margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:#0d1117;aspect-ratio:16/9">';
+    h+='<img src="'+esc(img)+'" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:10px" onerror="this.parentElement.style.display=\'none\'">';
+    h+='</div>';
+  }
+  return h;
+}
+function renderXPosts(){
+  var tab=document.getElementById('tab-posts');
+  if(!P.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128221;</div><div>Tidak ada tweet</div></div>';return;}
+  var list=_showAll?P:P.slice(0,10);
+  tab.innerHTML=list.map(function(p,i){
+    var tt=(p.tweet_type||p.action_type||'POST').toUpperCase();
+    var sent=getSent(p);var sclr=sentCls(sent);
+    var date=esc(p.created_at||'');
+    var text=esc((p.text||p.content||'').substring(0,280));
+    var ca=p.content_analysis||{};
+    var topic=esc(ca.topic||p.topic||'');
+    var m=p.metrics||{};
+    var turl=esc(p.tweet_url||p.post_url||'');
+    var inReply=p.in_reply_to_user?'<div style="font-size:10px;color:var(--muted);margin-bottom:4px">&#8627; reply ke <b style="color:#1d9bf0">@'+esc(p.in_reply_to_user)+'</b></div>':'';
+    var htags=(p.hashtags||[]).slice(0,6).map(function(h){return'<span style="color:#1d9bf0;font-size:10px;margin-right:4px">#'+esc(h)+'</span>';}).join('');
+    return '<div class="post-card" id="xpc-'+i+'" style="border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:var(--card)">'
+      +'<div class="post-card-header" style="margin-bottom:8px">'
+      +(date?'<span class="post-date">'+date+'</span>':'')
+      +_xBadge(tt)
+      +(topic?'<span class="post-type" style="max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+topic+'</span>':'')
+      +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+      +(turl?'<a href="'+turl+'" target="_blank" style="margin-left:auto;font-size:11px;color:#1d9bf0;text-decoration:none;white-space:nowrap">&#128279; Buka</a>':'')
+      +'</div>'
+      +inReply
+      +(text?'<div style="font-size:13px;line-height:1.65;color:var(--text);margin-bottom:8px;word-break:break-word">'+text+'</div>':'')
+      +_xMedia(p,i)
+      +(htags?'<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:3px">'+htags+'</div>':'')
+      +'<div style="margin-top:8px">'+_xMet(m,{showQ:true,showB:true})+'</div>'
+      +'<button class="expand-btn" onclick="toggleXPostAI('+i+',this)" style="margin-top:8px">&#9660; EXPAND AI ANALYSIS</button>'
+      +'<div class="ai-panel" id="xai-'+i+'"></div>'
+      +'</div>';
+  }).join('');
+  if(!_showAll&&P.length>10){
+    tab.innerHTML+='<div style="text-align:center;margin-top:12px"><button class="btn btn-export" onclick="_showAll=true;renderXPosts()" style="font-size:11px;padding:8px 20px">Show All '+P.length+' Tweets &#9660;</button></div>';
+  }
+}
+function toggleXPostAI(idx,btn){
+  var panel=document.getElementById('xai-'+idx);if(!panel)return;
+  if(panel.classList.contains('show')){panel.classList.remove('show');btn.innerHTML='&#9660; EXPAND AI ANALYSIS';return;}
+  btn.innerHTML='&#9650; COLLAPSE';
+  var p=P[idx];if(!p){panel.classList.add('show');return;}
+  var ca=p.content_analysis||{};
+  var vd=esc(ca.ai_description||p.ai_description||p.visual_description||'');
+  var turl=p.tweet_url||p.post_url||'';
+  var refUrl=p.referenced_tweet_url||'';
+  var html='';
+  if(turl)html+='<div class="ai-panel-section"><a href="'+esc(turl)+'" target="_blank" style="font-size:11px;color:#1d9bf0;font-weight:700">&#128038; Buka di X/Twitter</a></div>';
+  if(vd)html+='<div class="ai-panel-section"><div class="ai-panel-title">&#129302; AI DESCRIPTION</div><div class="ai-panel-text">'+vd+'</div></div>';
+  if(ca.topic)html+='<div class="ai-panel-section"><div class="ai-panel-title">TOPIC</div><div class="ai-panel-text" style="color:var(--accent);font-weight:700">'+esc(ca.topic)+'</div></div>';
+  if(ca.mood)html+='<div class="ai-panel-section"><div class="ai-panel-title">MOOD</div><div class="ai-panel-text">'+esc(ca.mood)+'</div></div>';
+  if(ca.engagement_level)html+='<div class="ai-panel-section"><div class="ai-panel-title">ENGAGEMENT</div><div class="ai-panel-text" style="color:#f59e0b;font-weight:700">'+esc(ca.engagement_level)+'</div></div>';
+  if(refUrl)html+='<div class="ai-panel-section"><div class="ai-panel-title">REFERENCED TWEET</div><a href="'+esc(refUrl)+'" target="_blank" style="font-size:11px;color:#1d9bf0">&#128279; '+esc(refUrl.substring(0,60))+'</a></div>';
+  if((p.hashtags||[]).length)html+='<div class="ai-panel-section"><div class="ai-panel-title">HASHTAGS</div><div style="display:flex;flex-wrap:wrap;gap:4px">'+(p.hashtags||[]).map(function(h){return'<span style="font-size:10px;padding:1px 6px;border-radius:20px;background:rgba(29,155,240,.1);color:#1d9bf0">#'+esc(h)+'</span>';}).join('')+'</div></div>';
+  if(!html)html='<div class="ai-panel-section" style="color:#888;font-size:11px">Tidak ada data AI.</div>';
+  panel.innerHTML=html;panel.classList.add('show');
+}
+function renderXReplies(repliesList){
+  var tab=document.getElementById('tab-replies');if(!tab)return;
+  var list=(repliesList||C||[]).slice(0,10);
+  if(!list.length){
+    tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128172;</div><div>Tidak ada reply dari @'+esc(PRF.username||'target')+'</div></div>';
+    return;
+  }
+  tab.innerHTML='<div style="background:rgba(29,155,240,.06);border:1px solid rgba(29,155,240,.15);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:#1d9bf0;font-weight:700">&#128172; Reply dari @'+esc(PRF.username||'target')+' ('+list.length+')</div>'
+    +list.map(function(c,i){
+      var text=esc((c.text||c.content||c.reply_text||'').substring(0,300));
+      var date=esc(c.created_at||'');
+      var sent=getSent(c);var sclr=sentCls(sent);
+      var turl=esc(c.tweet_url||c.post_url||'');
+      var replyTo=esc(c.in_reply_to_user||c.reply_to||'');
+      var m=c.metrics||{likes:c.likes||0,replies:c.replies||0,quotes:c.quotes||0,views:c.views||0,bookmarks:c.bookmarks||0};
+      var mediaHtml=_xMedia(c,'rp'+i);
+      var htags=(c.hashtags||[]).slice(0,5).map(function(h){return'<span style="color:#1d9bf0;font-size:10px;margin-right:4px">#'+esc(h)+'</span>';}).join('');
+      return '<div class="post-card">'
+        +'<div class="post-card-header">'
+        +(date?'<span class="post-date">'+date+'</span>':'')
+        +'<span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:5px;background:rgba(29,155,240,.12);color:#1d9bf0">&#128172; REPLY</span>'
+        +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+        +(turl?'<a href="'+turl+'" target="_blank" style="margin-left:auto;font-size:10px;color:#1d9bf0">&#128279;</a>':'')
+        +'</div>'
+        +(replyTo?'<div style="font-size:11px;color:var(--muted);margin-bottom:6px;padding:3px 8px;background:rgba(255,255,255,.03);border-radius:4px;border-left:2px solid #1d9bf0">&#8627; reply ke <b style="color:#1d9bf0">@'+replyTo+'</b></div>':'')
+        +(text?'<div style="font-size:13px;color:var(--text);line-height:1.6;word-break:break-word;margin-bottom:6px">'+text+'</div>':'')
+        +mediaHtml
+        +(htags?'<div style="margin-top:4px;margin-bottom:4px">'+htags+'</div>':'')
+        +_xMet(m,{showQ:true,showB:false})
+        +'</div>';
+    }).join('');
+}
+function renderXComments(){renderXReplies(C);}
+function renderXReposts(){
+  var tab=document.getElementById('tab-reposts');if(!tab)return;
+  // R = server-side reposts. Kalau kosong, scan allActs untuk RT @ text
+  var list=R.length?R:[];
+  if(!list.length){
+    var allActs=(XBM&&XBM.activities)?XBM.activities:[];
+    allActs.forEach(function(a){
+      var tx=a.text||a.content||'';
+      var rtm=tx.match(/^RT @(\w+):\s*(.*)/s);
+      if(rtm||a.is_retweet===true||a.is_repost===true||(a.tweet_type||'').toUpperCase()==='RETWEET'){
+        var _orig=a.original_author||a.orig_author||(rtm?rtm[1]:'');
+        var _otx =a.original_caption||a.orig_text||(rtm?rtm[2]:'') ||tx.replace(/^RT @\w+:\s*/,'');
+        list.push({
+          tweet_url:           a.tweet_url||a.post_url||'',
+          original_author:     _orig,
+          original_author_url: _orig?('https://x.com/'+_orig):'',
+          original_tweet_url:  a.referenced_tweet_url||'',
+          original_caption:    (_otx||'').substring(0,300),
+          repost_date:         a.created_at||'',
+          created_at:          a.created_at||'',
+          hashtags:            a.hashtags||[],
+          metrics:             a.metrics||{likes:a.likes||0},
+          sentiment:           a.sentiment||{label:'NEUTRAL',score:0.5},
+        });
+      }
+    });
+  }
+  list=list.slice(0,10);
+  if(!list.length){
+    tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128257;</div><div>Tidak ada repost dari @'+esc(PRF.username||'target')+'</div></div>';
+    return;
+  }
+  tab.innerHTML='<div style="background:rgba(0,186,124,.06);border:1px solid rgba(0,186,124,.15);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:#00ba7c;font-weight:700">&#128257; Repost dari @'+esc(PRF.username||'target')+' ('+list.length+')</div>'
+    +list.map(function(rt,i){
+      var sent=getSent(rt);var sclr=sentCls(sent);
+      var date=esc(rt.repost_date||rt.retweet_date||rt.created_at||'');
+      // Support dua format: server retweet object vs activities tweet
+      var origAuthor=esc(rt.original_author||rt.orig_author||'');
+      var origText=esc((rt.original_caption||rt.original_text||rt.orig_text||rt.text||'').substring(0,300));
+      var origUrl=esc(rt.original_tweet_url||rt.referenced_tweet_url||rt.retweet_url||'');
+      var turl=esc(rt.tweet_url||rt.retweet_url||rt.video_url||'');
+      var m=rt.metrics||{likes:rt.likes||0};
+      var mediaHtml=_xMedia(rt,'rt'+i);
+      return '<div class="post-card">'
+        +'<div class="post-card-header">'
+        +(date?'<span class="post-date">'+date+'</span>':'')
+        +'<span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:5px;background:rgba(0,186,124,.12);color:#00ba7c">&#128257; REPOST</span>'
+        +(turl?'<a href="'+turl+'" target="_blank" style="margin-left:auto;font-size:10px;color:#1d9bf0">&#128279;</a>':'')
+        +'</div>'
+        +(origAuthor?'<div style="font-size:11px;color:#1d9bf0;font-weight:700;margin-bottom:6px">&#128038; dari @'+origAuthor+'</div>':'')
+        +'<div style="background:rgba(29,155,240,.04);border:1px solid rgba(29,155,240,.12);border-radius:8px;padding:10px 12px;margin-bottom:8px">'
+        +(origText?'<div style="font-size:13px;line-height:1.6;color:var(--text)">'+origText+'</div>':'<div style="font-size:12px;color:#64748b;font-style:italic">Konten tidak tersedia</div>')
+        +(origUrl?'<a href="'+origUrl+'" target="_blank" style="font-size:10px;color:#1d9bf0;margin-top:6px;display:block">&#128279; Lihat tweet asli</a>':'')
+        +'</div>'
+        +mediaHtml
+        +_xMet(m,{showQ:false,showB:true})
+        +'</div>';
+    }).join('');
+}
+
+function renderXQuotes(){
+  var tab=document.getElementById('tab-quotes');if(!tab)return;
+  if(!XQ.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#10077;</div><div>Tidak ada quote tweet</div></div>';return;}
+  tab.innerHTML=XQ.map(function(q,i){
+    var sent=getSent(q);var sclr=sentCls(sent);
+    var date=esc(q.created_at||'');
+    var comment=esc((q.quote_comment||q.text||q.content||'').substring(0,280));
+    var m=q.metrics||{};
+    var turl=esc(q.tweet_url||q.post_url||'');
+    var refUrl=esc(q.quoted_tweet_url||q.referenced_tweet_url||q.original_tweet_url||'');
+    var origAuthor=esc(q.original_author||'');
+    var origText=esc((q.original_text||'').substring(0,120));
+    return '<div class="post-card">'
+      +'<div class="post-card-header">'
+      +(date?'<span class="post-date">'+date+'</span>':'')
+      +'<span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:5px;background:rgba(245,158,11,.12);color:#f59e0b">&#10077; QUOTE TWEET</span>'
+      +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+      +(turl?'<a href="'+turl+'" target="_blank" style="margin-left:auto;font-size:10px;color:#1d9bf0">&#128279;</a>':'')
+      +'</div>'
+      +(comment?'<div style="font-size:13px;line-height:1.6;color:var(--text);margin-bottom:8px">'+comment+'</div>':'')
+      +(refUrl?'<div style="background:rgba(29,155,240,.05);border:1px solid rgba(29,155,240,.15);border-radius:8px;padding:10px 12px;margin-bottom:8px">'
+        +(origAuthor?'<div style="font-size:10px;color:#1d9bf0;font-weight:700;margin-bottom:4px">&#128038; @'+origAuthor+'</div>':'')
+        +(origText?'<div style="font-size:11px;color:#94a3b8;line-height:1.5">'+origText+'</div>':'')
+        +'<a href="'+refUrl+'" target="_blank" style="font-size:10px;color:#1d9bf0;margin-top:4px;display:block">&#128279; Lihat tweet asli</a>'
+        +'</div>':'')
+      +_xMet(m,{showQ:false,showB:true})
+      +'</div>';
+  }).join('');
+}
+
+function renderXMedia(mediaList){
+  var tab=document.getElementById('tab-media');if(!tab)return;
+  var list=(mediaList||[]).slice(0,10);
+  // Jika tidak ada mediaList, kumpulkan dari activities P
+  if(!list.length){
+    var allActs=XBM&&XBM.activities?XBM.activities:P;
+    list=allActs.filter(function(a){
+      var med=a.media||{};
+      return med.image_url||med.video_url||med.gif_url||(med.all_media&&med.all_media.length);
+    });
+  }
+  if(!list.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#127910;</div><div>Tidak ada media ditemukan</div></div>';return;}
+  // Grid layout
+  var html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:4px">';
+  list.forEach(function(a,i){
+    var med=a.media||{};
+    var img=med.image_url||'';
+    var vid=med.video_url||'';
+    var gif=med.gif_url||'';
+    var all=med.all_media||[];
+    var date=esc(a.created_at||'');
+    var turl=esc(a.tweet_url||'');
+    var m=a.metrics||{};
+    var type=vid?'VIDEO':gif?'GIF':'IMAGE';
+    var badge=vid?'&#127910; VIDEO':gif?'&#128247; GIF':'&#128247; IMAGE';
+    var badgeClr=vid?'#1d9bf0':gif?'#f59e0b':'#00ba7c';
+    // Gunakan pertama dari all_media jika ada
+    var firstImg=img||(all.length?all[0]:'');
+    var mediaSrc=proxyImg(firstImg);
+    html+='<div style="background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--border);cursor:pointer" onclick="'+( turl?'window.open(\''+turl+'\',\'_blank\')':'')+'">';
+    if(vid){
+      html+='<div style="aspect-ratio:16/9;background:#0d1117;display:flex;align-items:center;justify-content:center;position:relative">'
+        +'<div style="font-size:40px;opacity:.6">&#9654;</div>'
+        +'<div style="position:absolute;top:6px;right:6px;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;background:rgba(29,155,240,.9);color:#fff">'+badge+'</div>'
+        +'</div>';
+    } else if(mediaSrc){
+      html+='<div style="aspect-ratio:1;overflow:hidden;position:relative">'
+        +'<img src="'+esc(mediaSrc)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\'<div style=&quot;width:100%;height:100%;background:#1a2035;display:flex;align-items:center;justify-content:center;font-size:28px&quot;>&#128247;</div>\'">'
+        +'<div style="position:absolute;top:6px;right:6px;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.7);color:'+badgeClr+'">'+badge+'</div>'
+        +(all.length>1?'<div style="position:absolute;bottom:6px;right:6px;font-size:9px;background:rgba(0,0,0,.7);color:#fff;padding:2px 5px;border-radius:4px">+'+all.length+'</div>':'')
+        +'</div>';
+    } else {
+      html+='<div style="aspect-ratio:1;background:#1a2035;display:flex;align-items:center;justify-content:center;font-size:28px">&#128247;</div>';
+    }
+    html+='<div style="padding:8px">'
+      +(date?'<div style="font-size:10px;color:#64748b;margin-bottom:4px">'+date+'</div>':'')
+      +'<div style="display:flex;gap:8px;font-size:10px;color:#94a3b8">'
+      +(m.likes?'<span>&#10084; '+fmt(m.likes)+'</span>':'')
+      +(m.views?'<span>&#128065; '+fmt(m.views)+'</span>':'')
+      +'</div>'
+      +'</div>'
+      +'</div>';
+  });
+  html+='</div>';
+  tab.innerHTML=html;
+}
+
+function renderXUserComments(ucList){
+  var tab=document.getElementById('tab-usercomments');if(!tab)return;
+  var list=(ucList||[]).slice(0,10);
+  // Fallback: cek dari XBM.user_comments
+  if(!list.length&&XBM&&XBM.user_comments)list=XBM.user_comments;
+  if(!list.length){
+    tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128483;</div><div>Tidak ada user comment terdeteksi</div></div>';
+    return;
+  }
+  tab.innerHTML=list.map(function(uc,i){
+    var sent=getSent(uc);var sclr=sentCls(sent);
+    var date=esc(uc.created_at||'');
+    var text=esc((uc.reply_text||uc.comment_text||uc.text||uc.content||'').substring(0,400));
+    var replyTo=esc(uc.reply_to||uc.in_reply_to_user||'');
+    var postUrl=esc(uc.post_url||uc.tweet_url||'');
+    var likes=fmt(uc.likes||0);
+    var replies=fmt(uc.replies||0);
+    var stickerUrl=uc.sticker_url||uc.image_url||'';
+    var isSticker=(text==='[Stiker/Emoji]'||(!text&&stickerUrl));
+    return '<div class="post-card">'
+      +'<div class="post-card-header">'
+      +(date?'<span class="post-date">'+date+'</span>':'')
+      +'<span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:5px;background:rgba(139,92,246,.12);color:#8b5cf6">'+(replyTo?'&#8618; REPLY':'&#128483; COMMENT')+'</span>'
+      +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+      +(postUrl?'<a href="'+postUrl+'" target="_blank" style="margin-left:auto;font-size:10px;color:#1d9bf0">&#128279;</a>':'')
+      +'</div>'
+      +(replyTo?'<div style="font-size:10px;color:#64748b;margin-bottom:6px">&#8618; Reply to <span style="color:#1d9bf0">@'+replyTo+'</span></div>':'')
+      +(stickerUrl
+        ?'<div style="margin-bottom:8px"><img src="'+esc(stickerUrl)+'" style="max-width:100px;max-height:100px;border-radius:8px" onerror="this.style.display=\'none\'"></div>'
+        :'')
+      +(text&&!isSticker?'<div style="font-size:13px;line-height:1.6;color:var(--text);margin-bottom:8px">'+text+'</div>':'')
+      +(isSticker&&!stickerUrl?'<div style="font-size:13px;color:#8b5cf6;margin-bottom:8px">&#127827; Stiker</div>':'')
+      +'<div style="display:flex;gap:12px;font-size:11px;color:#64748b">'
+      +(likes?'<span>&#10084; '+likes+'</span>':'')
+      +(replies?'<span>&#128172; '+replies+'</span>':'')
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function renderFBAbout(){
+  var tab=document.getElementById('tab-fb-about');if(!tab)return;
+  var p=PRF;
+  var html='<div style="padding:4px">';
+  // Intro/Bio
+  if(p.bio||p.about_me){
+    html+='<div style="background:var(--card);border-radius:10px;padding:16px;margin-bottom:12px;border:1px solid var(--border)">';
+    html+='<div style="font-size:11px;font-weight:800;color:#1877f2;margin-bottom:8px;text-transform:uppercase">&#128101; Intro</div>';
+    if(p.bio) html+='<div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:8px">'+esc(p.bio)+'</div>';
+    if(p.about_me&&p.about_me!==p.bio) html+='<div style="font-size:12px;color:#94a3b8;line-height:1.6">'+esc(p.about_me.substring(0,400))+'</div>';
+    html+='</div>';
+  }
+  // Info grid
+  var infoItems=[
+    p.location?['&#128205; Location',p.location]:null,
+    p.address&&p.address!==p.location?['&#128205; Address',p.address]:null,
+    p.website?['&#127760; Website','<a href="'+esc(p.website)+'" target="_blank" style="color:#1877f2">'+esc(p.website)+'</a>']:null,
+    p.email?['&#128140; Email',p.email]:null,
+    p.phone?['&#128222; Phone',p.phone]:null,
+    p.join_date?['&#128197; Created',p.join_date]:null,
+    p.rating?['&#11088; Rating',p.rating]:null,
+    (p.categories&&p.categories.length)?['&#127991; Categories',p.categories.slice(0,3).join(', ')]:null,
+  ].filter(Boolean);
+  if(infoItems.length){
+    html+='<div style="background:var(--card);border-radius:10px;padding:16px;border:1px solid var(--border)">';
+    html+='<div style="font-size:11px;font-weight:800;color:#1877f2;margin-bottom:12px;text-transform:uppercase">&#128196; Page Info</div>';
+    infoItems.forEach(function(item){
+      html+='<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">';
+      html+='<span style="font-size:12px;color:#64748b;min-width:120px;flex-shrink:0">'+item[0]+'</span>';
+      html+='<span style="font-size:13px;color:var(--text);word-break:break-all">'+esc(item[1])+'</span>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+  if(!infoItems.length&&!p.bio&&!p.about_me){
+    html+='<div class="empty-state"><div class="empty-ico">&#128101;</div><div>Info profil tidak tersedia</div></div>';
+  }
+  html+='</div>';
+  tab.innerHTML=html;
+}
+
+function renderFBChannels(){
+  var tab=document.getElementById('tab-fb-channels');if(!tab)return;
+  // Facebook Channels: tidak ada data dari scraper — tampilkan info
+  tab.innerHTML='<div style="padding:20px;text-align:center">'
+    +'<div style="font-size:32px;margin-bottom:12px">&#128250;</div>'
+    +'<div style="font-size:13px;color:#94a3b8;margin-bottom:8px">Channels adalah fitur Facebook terbaru</div>'
+    +'<div style="font-size:11px;color:#64748b">Data channels tidak tersedia via scraper publik.<br>Kunjungi halaman Facebook langsung untuk melihat channels.</div>'
+    +'<a href="https://www.facebook.com/'+esc(PRF.username||'')+'/channels" target="_blank" '
+    +'style="display:inline-block;margin-top:16px;background:#1877f2;color:#fff;padding:8px 20px;'
+    +'border-radius:20px;font-size:12px;font-weight:700;text-decoration:none">&#128279; Buka di Facebook</a>'
+    +'</div>';
+}
+
+function renderFBMentions(mentionsList){
+  var tab=document.getElementById('tab-fb-mentions');if(!tab)return;
+  var list=(mentionsList||[]).slice(0,10);
+  if(!list.length){
+    tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128273;</div><div>Tidak ada post dengan mention ditemukan</div></div>';
+    return;
+  }
+  tab.innerHTML=list.map(function(p,i){
+    var cap=esc((p.content||p.text||'').substring(0,250));
+    var date=esc(p.created_at||'');
+    var mentions=(p.mentions||p.tagged_users||[]).slice(0,8);
+    var likes=fmt(p.likes||0);var comms=fmt(p.comments||0);var shares=fmt(p.shares||0);
+    var sent=getSent(p);var sclr=sentCls(sent);
+    var postUrl=p.post_url||'';
+    var topic=esc((p.content_analysis||{}).topic||p.topic||'');
+
+    // Mention badges dengan foto profil (gunakan unavatar fallback)
+    var mnHtml='';
+    if(mentions.length){
+      mnHtml='<div style="margin-bottom:10px">'
+        +'<div style="font-size:10px;color:#64748b;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">&#128100; Disebutkan dalam post:</div>'
+        +'<div style="display:flex;flex-wrap:wrap;gap:8px">'
+        +mentions.map(function(m){
+          var handle=typeof m==='object'?(m.username||m.name||m):m;
+          var dispName=typeof m==='object'?(m.name||m.username||m):m;
+          var avatarUrl='https://unavatar.io/facebook/'+encodeURIComponent(handle);
+          return '<div style="display:flex;align-items:center;gap:6px;background:rgba(24,119,242,.08);border:1px solid rgba(24,119,242,.2);border-radius:20px;padding:4px 10px 4px 4px">'
+            +'<img src="'+avatarUrl+'" style="width:22px;height:22px;border-radius:50%;object-fit:cover" onerror="this.style.display=\'none\'">'
+            +'<span style="color:#1877f2;font-size:11px;font-weight:700">@'+esc(String(dispName))+'</span>'
+            +'</div>';
+        }).join('')
+        +'</div></div>';
+    }
+
+    // Media (foto atau video)
+    var mediaHtml=_fbMediaCard(p,'ment'+i);
+
+    return '<div class="post-card">'
+      +'<div class="post-card-header">'
+      +(date?'<span class="post-date">'+date+'</span>':'')
+      +'<span class="post-platform" style="background:#1877f2">FB</span>'
+      +'<span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:5px;background:rgba(255,171,0,.12);color:#ffab00">&#128100; MENTION</span>'
+      +(topic?'<span class="post-type">'+topic+'</span>':'')
+      +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+      +(postUrl?'<a href="'+esc(postUrl)+'" target="_blank" style="margin-left:auto;font-size:10px;color:#1877f2">&#128279;</a>':'')
+      +'</div>'
+      +mnHtml
+      +(cap?'<div class="post-caption">'+cap+'</div>':'')
+      +mediaHtml
+      +'<div class="post-metrics" style="margin-top:8px">'
+      +(likes?'<span class="post-metric">&#128077; <span class="post-metric-val">'+likes+'</span></span>':'')
+      +(comms?'<span class="post-metric">&#128172; <span class="post-metric-val">'+comms+'</span></span>':'')
+      +(shares?'<span class="post-metric">&#128257; <span class="post-metric-val">'+shares+'</span></span>':'')
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function renderFBUserComments(ucList){
+  var tab=document.getElementById('tab-fb-uc');if(!tab)return;
+  var list=(ucList||[]).slice(0,10);
+  if(!list.length){
+    tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128172;</div><div>Tidak ada komentar dari @'+esc(PRF.username||'target')+'</div></div>';
+    return;
+  }
+  tab.innerHTML='<div style="background:rgba(24,119,242,.06);border:1px solid rgba(24,119,242,.15);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:#1877f2;font-weight:700">&#128172; Komentar dari @'+esc(PRF.username||'target')+' ('+list.length+')</div>'
+    +list.map(function(c){
+      var text=esc(c.comment_text||c.content||c.text||'');
+      var date=esc(c.created_at||'');
+      var likes=Number(c.likes||0);
+      var sent=getSent(c);var sclr=sentCls(sent);
+      var postUrl=c.post_url||'';
+      var postCap=esc((c.post_caption||'').substring(0,80));
+      return '<div class="post-card">'
+        +'<div class="post-card-header">'
+        +(date?'<span class="post-date">'+date+'</span>':'')
+        +'<span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:5px;background:rgba(24,119,242,.12);color:#1877f2">&#128172; COMMENT</span>'
+        +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+        +(postUrl?'<a href="'+esc(postUrl)+'" target="_blank" style="margin-left:auto;font-size:10px;color:#1877f2">&#128279;</a>':'')
+        +'</div>'
+        +(postCap?'<div style="background:rgba(24,119,242,.05);border:1px solid rgba(24,119,242,.1);border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:10px;color:#94a3b8">&#128221; '+postCap+'</div>':'')
+        +'<div style="background:rgba(24,119,242,.04);border:1px solid rgba(24,119,242,.1);border-radius:8px;padding:10px 14px">'
+        +'<div style="font-size:10px;color:#1877f2;font-weight:700;margin-bottom:4px">&#128172; '+esc(PRF.username||'target')+'</div>'
+        +'<div style="font-size:13px;color:var(--text);line-height:1.6">'+text+'</div>'
+        +'</div>'
+        +(likes?'<div class="post-metrics" style="margin-top:6px"><span class="post-metric">&#128077; <span class="post-metric-val">'+fmt(likes)+'</span></span></div>':'')
+        +'</div>';
+    }).join('');
+}
+
+
+function toggleReelAI(idx,btn){
+  var panel=document.getElementById('reel-ai-'+idx);if(!panel)return;
+  if(panel.classList.contains('show')){panel.classList.remove('show');btn.innerHTML='&#9660; EXPAND AI ANALYSIS';return;}
+  btn.innerHTML='&#9650; COLLAPSE';
+  var list=window._fbReelsData||[];
+  var p=list[idx];if(!p){panel.classList.add('show');return;}
+  var ca=p.content_analysis||{};
+  var sent=getSent(p);var sclr=sentColor(sent);
+  var vd=esc(ca.ai_description||p.ai_description||p.visual_description||ca.content_summary||'');
+  var topic=esc(ca.topic||p.topic||'');
+  var mood=esc(ca.mood||p.mood||'');
+  var postUrl=p.post_url||'';
+  var html='';
+  // Metrics
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:10px 0">';
+  html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#fff">'+fmt(p.likes||0)+'</div><div style="font-size:9px;color:var(--muted)">Likes</div></div>';
+  html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#fff">'+fmt(p.comments||0)+'</div><div style="font-size:9px;color:var(--muted)">Comments</div></div>';
+  html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#fff">'+fmt(p.shares||0)+'</div><div style="font-size:9px;color:var(--muted)">Shares</div></div>';
+  html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#fff">'+fmt(p.plays||p.views||0)+'</div><div style="font-size:9px;color:var(--muted)">Views</div></div>';
+  html+='</div>';
+  // Sentimen
+  html+='<div class="ai-panel-section"><div class="ai-panel-title">&#129302; Sentimen</div>';
+  html+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px;color:'+sclr+'">'+(sent==='POSITIVE'?'&#128522;':sent==='NEGATIVE'?'&#128545;':'&#128528;')+'</span><span style="font-size:13px;font-weight:800;color:'+sclr+'">'+sent+'</span></div></div>';
+  // AI Description
+  if(vd){
+    html+='<div class="ai-panel-section"><div class="ai-panel-title">&#129302; AI Content Analysis <span style="font-size:9px;padding:1px 6px;border-radius:10px;background:rgba(24,119,242,.2);color:#1877f2;margin-left:6px">Facebook Reels</span></div>';
+    var formatted=vd.replace(/\n\n/g,'</p><p style="margin-top:8px">').replace(/\n/g,'<br>');
+    html+='<div class="ai-panel-text" style="line-height:1.8"><p>'+formatted+'</p></div></div>';
+  }
+  // Topic
+  if(topic) html+='<div class="ai-panel-section"><div class="ai-panel-title">&#127991;&#65039; Topic</div><div class="ai-panel-text" style="color:var(--accent);font-weight:700">'+topic+'</div></div>';
+  // Mood
+  if(mood) html+='<div class="ai-panel-section"><div class="ai-panel-title">&#128519; Mood</div><div class="ai-panel-text">'+mood+'</div></div>';
+  // Hashtags
+  var hts=ca.key_themes||p.hashtags||[];
+  if(hts.length>0){
+    html+='<div class="ai-panel-section"><div class="ai-panel-title">&#127991;&#65039; Hashtags / Themes</div><div style="display:flex;flex-wrap:wrap;gap:4px">';
+    hts.slice(0,10).forEach(function(h){html+='<span style="font-size:9px;padding:1px 6px;border-radius:20px;background:rgba(24,119,242,.1);color:#1877f2;font-weight:600">#'+esc(h)+'</span>';});
+    html+='</div></div>';
+  }
+  // Link
+  if(postUrl) html+='<div class="ai-panel-section"><a href="'+esc(postUrl)+'" target="_blank" style="font-size:11px;color:#1877f2;font-weight:700;text-decoration:none">&#128279; Buka Reel di Facebook</a></div>';
+  if(!html) html='<div class="ai-panel-section" style="color:#888;font-size:11px">Tidak ada data AI tambahan.</div>';
+  panel.innerHTML=html;panel.classList.add('show');
+}
+
+function _fbIsVideo(p){
+  var pu=p.post_url||'';
+  return !!(p.media_type==='video'||p.video_url||
+         pu.indexOf('/reel/')!==-1||pu.indexOf('/videos/')!==-1||
+         pu.indexOf('/watch/')!==-1||
+         (p.media_list||[]).some(function(m){return m.type==='video';}));
+}
+
+function _fbMediaCard(p,idx){
+  var pu=p.post_url||'';
+  var vidUrl=p.video_url||'';
+  var thumb=proxyImg(p.cover_url||p.image_url||'');
+  var isVid=_fbIsVideo(p);
+  var isReel=pu.indexOf('/reel/')!==-1;
+
+  if(isVid){
+    if(vidUrl){
+      var vproxy='/api/v1/proxy/image?url='+encodeURIComponent(vidUrl);
+      return '<div style="margin-top:10px;border-radius:12px;overflow:hidden;background:#0d1117;position:relative">'
+        +'<video controls playsinline preload="metadata" id="fbvid-card-'+idx+'" muted '
+        +'style="width:100%;max-height:300px;display:block;background:#000;'+(isReel?'aspect-ratio:9/16;max-height:420px':'object-fit:contain')+'" '
+        +(thumb?'poster="'+esc(thumb)+'" ':'' )
+        +'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+        +'<source src="'+esc(vproxy)+'" type="video/mp4">'
+        +'</video>'
+        +'<div style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:10px">'
+        +(thumb?'<img src="'+esc(thumb)+'" style="width:100%;max-height:280px;object-fit:cover;border-radius:8px">':'')
+        +'<a href="'+esc(pu)+'" target="_blank" style="background:#1877f2;color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:800;text-decoration:none">&#127910; Buka di Facebook</a>'
+        +'</div>'
+        +'<script>setTimeout(function(){var v=document.getElementById("fbvid-card-'+idx+'");if(v){v.muted=false;v.volume=1;v.addEventListener("play",function(){v.muted=false;v.volume=1;});}},200);<\/script>'
+        +'</div>';
+    } else {
+      return '<div style="margin-top:10px;border-radius:12px;overflow:hidden;background:#0d1117;position:relative;'+(isReel?'aspect-ratio:9/16;max-height:400px':'max-height:320px')+'">'
+        +(thumb?'<img src="'+esc(thumb)+'" style="width:100%;height:100%;object-fit:cover;display:block">':'<div style="height:200px;background:#111;display:flex;align-items:center;justify-content:center"><span style="font-size:40px;opacity:.3">&#127910;</span></div>')
+        +(pu?'<a href="'+esc(pu)+'" target="_blank" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(0,0,0,.35);text-decoration:none">'
+          +'<div style="width:56px;height:56px;background:rgba(24,119,242,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(24,119,242,.5)">'
+          +'<span style="font-size:22px;margin-left:4px;color:#fff">&#9654;</span></div>'
+          +'<div style="font-size:11px;color:#fff;font-weight:700;background:rgba(0,0,0,.55);padding:3px 10px;border-radius:15px">'+(isReel?'Putar Reel':'Putar Video')+'</div>'
+          +'</a>':'')
+        +'</div>';
+    }
+  } else {
+    // ── Kumpulkan semua foto dari berbagai sumber ──────────────────────
+    var allImgs=[];
+    // 1. Dari image_urls array (primary — spbotdel)
+    if(p.image_urls&&p.image_urls.length){
+      p.image_urls.forEach(function(u){if(u&&allImgs.indexOf(proxyImg(u))===-1)allImgs.push(proxyImg(u));});
+    }
+    // 2. Dari media_list (Apify facebook-posts-scraper)
+    if(allImgs.length===0&&p.media_list&&p.media_list.length){
+      p.media_list.forEach(function(m){
+        if(!m||m.type==='video')return;
+        var mu=m.url||m.thumbnail||'';
+        if(mu&&allImgs.indexOf(proxyImg(mu))===-1)allImgs.push(proxyImg(mu));
+      });
+    }
+    // 3. Fallback ke image_url / cover_url tunggal
+    if(allImgs.length===0){
+      var si=proxyImg(p.image_url||p.cover_url||'');
+      if(si) allImgs.push(si);
+    }
+    if(allImgs.length===0) return '';
+
+    if(allImgs.length===1){
+      // Single foto — tampilkan lebih compact
+      return '<div style="margin-top:8px;border-radius:10px;overflow:hidden">'
+        +'<img src="'+esc(allImgs[0])+'" style="width:100%;max-height:240px;object-fit:cover;display:block;border-radius:10px" onerror="this.style.display=\'none\'">'
+        +(pu?'<div style="text-align:right;padding:4px 0"><a href="'+esc(pu)+'" target="_blank" style="font-size:10px;color:#1877f2;text-decoration:none">Lihat di FB &#128279;</a></div>':'')
+        +'</div>';
+    }
+
+    // Carousel — grid sesuai jumlah foto seperti di Facebook
+    var n=Math.min(allImgs.length,6);
+    var extra=allImgs.length>6?allImgs.length-6:0;
+    var h='<div style="margin-top:8px;border-radius:10px;overflow:hidden">';
+
+    if(n===2){
+      // 2 foto: side by side
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">';
+      allImgs.slice(0,2).forEach(function(u){
+        h+='<div style="overflow:hidden;aspect-ratio:1">'
+          +'<img src="'+esc(u)+'" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display=\'none\'">'
+          +'</div>';
+      });
+      h+='</div>';
+    } else if(n===3){
+      // 3 foto: 1 besar kiri, 2 kecil kanan
+      h+='<div style="display:grid;grid-template-columns:2fr 1fr;gap:2px;height:200px">';
+      h+='<div style="overflow:hidden">'
+        +'<img src="'+esc(allImgs[0])+'" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display=\'none\'">'
+        +'</div>';
+      h+='<div style="display:grid;grid-template-rows:1fr 1fr;gap:2px">';
+      allImgs.slice(1,3).forEach(function(u){
+        h+='<div style="overflow:hidden">'
+          +'<img src="'+esc(u)+'" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display=\'none\'">'
+          +'</div>';
+      });
+      h+='</div></div>';
+    } else if(n===4){
+      // 4 foto: 2x2 grid
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">';
+      allImgs.slice(0,4).forEach(function(u){
+        h+='<div style="overflow:hidden;aspect-ratio:1">'
+          +'<img src="'+esc(u)+'" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display=\'none\'">'
+          +'</div>';
+      });
+      h+='</div>';
+    } else {
+      // 5+ foto: 1 besar atas, bawah 2 atau 4 kolom
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">';
+      h+='<div style="grid-column:1/3;overflow:hidden;max-height:200px">'
+        +'<img src="'+esc(allImgs[0])+'" style="width:100%;height:200px;object-fit:cover;display:block" onerror="this.parentElement.style.display=\'none\'">'
+        +'</div>';
+      allImgs.slice(1,5).forEach(function(u,ui){
+        var isLast=(ui===3&&extra>0);
+        h+='<div style="overflow:hidden;aspect-ratio:1;position:relative">'
+          +'<img src="'+esc(u)+'" style="width:100%;height:100%;object-fit:cover;display:block'+(isLast?';filter:brightness(0.5)':'')
+          +'" onerror="this.parentElement.style.display=\'none\'">'
+          +(isLast?'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:800">+'+(extra+1)+'</div>':'')
+          +'</div>';
+      });
+      h+='</div>';
+    }
+    h+=(pu?'<div style="text-align:right;padding:4px 2px"><a href="'+esc(pu)+'" target="_blank" style="font-size:10px;color:#1877f2;text-decoration:none">Lihat semua '+allImgs.length+' foto &#128279;</a></div>':'');
+    return h+'</div>';
+  }
+}
+
+function renderFBReels(reelsList){
+  var tab=document.getElementById('tab-fb-reels');if(!tab)return;
+  var list=reelsList||[];
+  if(!list.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#127910;</div><div>Tidak ada reels/video ditemukan</div></div>';return;}
+  // Simpan ke variable global untuk akses dari toggleReelAI
+  window._fbReelsData=list;
+  tab.innerHTML=list.map(function(p,i){
+    var cap=esc((p.content||p.text||'').substring(0,200));
+    var date=esc(p.created_at||'');
+    var likes=fmt(p.likes||0);var comms=fmt(p.comments||0);var plays=fmt(p.plays||p.views||0);
+    var postUrl=p.post_url||'';
+    var sent=getSent(p);var sclr=sentCls(sent);
+    var topic=esc((p.content_analysis||{}).topic||p.topic||'');
+    var isReel=(postUrl.indexOf('/reel/')!==-1);
+    var mediaHtml=_fbMediaCard(p,'reel'+i);
+    return '<div class="post-card">'
+      +'<div class="post-card-header">'
+      +(date?'<span class="post-date">'+date+'</span>':'')
+      +'<span class="post-platform" style="background:#1877f2">FB</span>'
+      +'<span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:5px;background:rgba(24,119,242,.12);color:#1877f2">'+(isReel?'&#127910; REEL':'&#127910; VIDEO')+'</span>'
+      +(topic?'<span class="post-type">'+topic+'</span>':'')
+      +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+      +(postUrl?'<a href="'+esc(postUrl)+'" target="_blank" style="margin-left:auto;font-size:10px;color:#1877f2">&#128279;</a>':'')
+      +'</div>'
+      +(cap?'<div class="post-caption">'+cap+'</div>':'')
+      +mediaHtml
+      +'<div class="post-metrics" style="margin-top:8px">'
+      +(likes?'<span class="post-metric">&#128077; <span class="post-metric-val">'+likes+'</span></span>':'')
+      +(comms?'<span class="post-metric">&#128172; <span class="post-metric-val">'+comms+'</span></span>':'')
+      +(plays?'<span class="post-metric">&#128065; <span class="post-metric-val">'+plays+'</span></span>':'')
+      +'</div>'
+      +'<button class="expand-btn" onclick="toggleReelAI('+i+',this)">&#9660; EXPAND AI ANALYSIS</button>'
+      +'<div class="ai-panel" id="reel-ai-'+i+'"></div>'
+      +'</div>';
+  }).join('');
+}
+
+function renderFBPhotos(photosList){
+  var tab=document.getElementById('tab-fb-photos');if(!tab)return;
+  var list=photosList||[];
+  if(!list.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128247;</div><div>Tidak ada foto publik</div></div>';return;}
+  var html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:4px">';
+  list.forEach(function(ph){
+    var imgUrl=ph.image_url||ph.photo_url||'';
+    if(!imgUrl)return;
+    var cap=esc((ph.caption||'').substring(0,60));
+    var date=esc(ph.date||'');
+    var likes=fmt(ph.likes||0);
+    var album=esc(ph.album||'');
+    var pageUrl=ph.photo_page||ph.post_url||'';
+    html+='<div style="background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--border);cursor:pointer"'
+      +(pageUrl?' onclick="window.open(\''+esc(pageUrl)+'\',\'_blank\')"':'')+' >'
+      +'<div style="aspect-ratio:1;overflow:hidden">'
+      +'<img src="'+esc(imgUrl)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\'<div style=&quot;width:100%;height:100%;background:#1a2035;display:flex;align-items:center;justify-content:center;font-size:28px&quot;>&#128247;</div>\'">'
+      +'</div>'
+      +'<div style="padding:8px">'
+      +(album?'<div style="font-size:9px;color:#1877f2;font-weight:700;margin-bottom:2px">'+album+'</div>':'')
+      +(cap?'<div style="font-size:10px;color:#94a3b8;line-height:1.4;margin-bottom:4px">'+cap+'</div>':'')
+      +'<div style="display:flex;justify-content:space-between;font-size:10px;color:#64748b">'
+      +(date?'<span>'+date+'</span>':'')
+      +(likes?'<span>&#128077; '+likes+'</span>':'')
+      +'</div>'
+      +'</div></div>';
+  });
+  html+='</div>';
+  tab.innerHTML=html;
+}
+
+function renderFBPosts(){
+  var tab=document.getElementById('tab-posts');
+  if(!P.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128101;</div><div>Tidak ada postingan Facebook</div></div>';return;}
+  var list=_showAll?P:P.slice(0,10);
+  var rxnIco={'like':'&#128077;','love':'&#10084;','care':'&#129489;','haha':'&#128514;','wow':'&#128558;','sad':'&#128546;','angry':'&#128544;'};
+  tab.innerHTML=list.map(function(p,i){
+    var cap=esc((p.content||p.text||p.caption||'').substring(0,250));
+    var date=esc(p.created_at||'');
+    var sent=getSent(p);var sclr=sentCls(sent);
+    var likes=fmt(p.likes||0);var comms=fmt(p.comments||0);var shares=fmt(p.shares||0);
+    var plays=fmt(p.plays||p.views||0);
+    var topic=esc((p.content_analysis||{}).topic||p.topic||'');
+    var rxns=p.reactions||{};
+    var rxnTotal=Object.values(rxns).reduce(function(a,b){return a+(b||0);},0);
+    var rxnHtml='';
+    if(rxnTotal>0){
+      rxnHtml='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">';
+      Object.entries(rxns).forEach(function(kv){
+        if(kv[1]>0) rxnHtml+='<span style="font-size:10px;background:rgba(255,255,255,.06);border-radius:12px;padding:2px 7px">'+( rxnIco[kv[0]]||'&#128077;')+' '+fmt(kv[1])+'</span>';
+      });
+      rxnHtml+='</div>';
+    }
+    var mediaHtml=_fbMediaCard(p,i);
+    var postUrl=p.post_url||'';
+    // Mentions badge
+    var ments=(p.mentions||[]).concat(p.tagged_users||[]);
+    var mentHtml=ments.length?'<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px">'
+      +ments.slice(0,5).map(function(m){return'<span style="background:rgba(24,119,242,.1);color:#1877f2;border-radius:10px;padding:1px 7px;font-size:10px">@'+esc(m)+'</span>';}).join('')
+      +'</div>':'';
+    return '<div class="post-card" id="fb-pc-'+i+'">'
+      +'<div class="post-card-header">'
+      +(date?'<span class="post-date">'+date+'</span>':'')
+      +'<span class="post-platform">FB</span>'
+      +(_fbIsVideo(p)?'<span style="font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;background:rgba(24,119,242,.12);color:#1877f2">&#127910; VIDEO</span>':'')
+      +(topic?'<span class="post-type">'+topic+'</span>':'')
+      +(p.is_repost?'<span style="font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;background:rgba(24,119,242,.1);color:#1877f2">&#128257; SHARE</span>':'')
+      +(p.is_ad?'<span style="font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;background:rgba(245,158,11,.1);color:#f59e0b">&#128202; AD</span>':'')
+      +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+      +(postUrl?'<a href="'+esc(postUrl)+'" target="_blank" style="margin-left:auto;font-size:10px;color:#1877f2;text-decoration:none">&#128279;</a>':'')
+      +'</div>'
+      +mentHtml
+      +(cap?'<div class="post-caption">'+cap+'</div>':'')
+      +mediaHtml
+      +rxnHtml
+      +'<div class="post-metrics">'
+      +(likes?'<span class="post-metric">&#128077; <span class="post-metric-val">'+likes+'</span></span>':'')
+      +(comms?'<span class="post-metric">&#128172; <span class="post-metric-val">'+comms+'</span></span>':'')
+      +(shares?'<span class="post-metric">&#128257; <span class="post-metric-val">'+shares+'</span></span>':'')
+      +(plays?'<span class="post-metric">&#128065; <span class="post-metric-val">'+plays+'</span></span>':'')
+      +'</div>'
+      +'<button class="expand-btn" onclick="togglePostAI('+i+',this)">&#9660; EXPAND AI ANALYSIS</button>'
+      +'<div class="ai-panel" id="ai-panel-'+i+'"></div>'
+      +'</div>';
+  }).join('');
+  if(!_showAll&&P.length>10){
+    tab.innerHTML+='<div style="text-align:center;margin-top:12px"><button class="btn btn-export" onclick="_showAll=true;renderFBPosts()" style="font-size:11px;padding:8px 20px">Show All '+P.length+' Posts &#9660;</button></div>';
+  }
+}
+
+function renderPosts(){
+  if(PLT==='x'||PLT==='twitter'){renderXPosts();return;}
+  if(PLT==='facebook'){renderFBPosts();return;}
+  var tab=document.getElementById('tab-posts');
+  if(!P.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128221;</div><div>Tidak ada postingan</div></div>';return;}
+  var list=_showAll?P:P.slice(0,10);
+  tab.innerHTML=list.map(function(p,i){
+    var cap=esc((p.caption||p.content||p.text||'').substring(0,200));
+    var date=esc(p.created_at||'');var sent=getSent(p);
+    var sclr=sentCls(sent);var views=fmt(p.views||p.plays||0);
+    var likes=fmt(p.likes||0);var comms=fmt(p.comments||0);var shares=fmt(p.shares||0);
+    var dur=p.duration_sec?p.duration_sec+'s':'';
+    var topic=esc(p.topic||'');
+    // Untuk Instagram: tampilkan thumbnail kecil di post card
+    var thumbHtml='';
+    if(PLT==='instagram'){
+      var _isVid=(p.media_type==='video'||p.media_type==='reel'||(p.duration_sec>0)||(p.views>0&&p.media_type!=='carousel'));
+      var thumbSrc=_isVid?'':proxyImg(p.image_url||p.cover_url||'');
+      if(_isVid){
+        thumbHtml='<div style="width:48px;height:48px;background:#1a2035;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">&#127910;</div>';
+      } else if(thumbSrc){
+        thumbHtml='<img src="'+esc(thumbSrc)+'" style="width:48px;height:48px;object-fit:cover;border-radius:6px;margin-right:4px;flex-shrink:0" onerror="this.style.display=\'none\'"/>';
+      }
+    } else if(PLT==='tiktok'){
+      // TikTok: foto slide → tampilkan grid kecil foto, video → icon play + thumbnail
+      var _tkIsSlide=(p.media_type==='image'||p.media_type==='carousel'||p.media_type==='sidecar');
+      var _tkImgList=p.images_list||p.image_urls||[];
+      var _tkCover=proxyImg(p.cover_url||p.image_url||'');
+      if(_tkIsSlide&&_tkImgList.length>0){
+        // Foto slide — tampilkan preview foto pertama + badge jumlah foto
+        var _fi=proxyImg(_tkImgList[0]);
+        thumbHtml='<div style="position:relative;width:56px;height:56px;flex-shrink:0;border-radius:6px;overflow:hidden;margin-right:4px">'
+          +'<img src="'+esc(_fi)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.style.background=\'#1a2035\'">'
+          +(_tkImgList.length>1?'<div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,.75);color:#fff;font-size:8px;font-weight:800;padding:1px 4px;border-radius:4px">&#128247;'+_tkImgList.length+'</div>':'')
+          +'</div>';
+      } else if(_tkCover){
+        // Video — thumbnail + play icon
+        thumbHtml='<div style="position:relative;width:56px;height:56px;flex-shrink:0;border-radius:6px;overflow:hidden;margin-right:4px">'
+          +'<img src="'+esc(_tkCover)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.style.background=\'#0d1117\'">'
+          +'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3)"><span style="font-size:16px;color:#fff">&#9654;</span></div>'
+          +'</div>';
+      } else {
+        thumbHtml='<div style="width:56px;height:56px;background:#0d1117;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;margin-right:4px">&#127910;</div>';
+      }
+    }
+    var capText=PLT==='tiktok'?(p.caption_text||p.caption||''):(p.caption||p.content||p.text||'');
+    var cap=esc(capText.substring(0,200));
+    return '<div class="post-card" id="pc-'+i+'">'
+      +'<div class="post-card-header">'
+      +(date?'<span class="post-date">'+date+'</span>':'')
+      +'<span class="post-platform">'+PLT.toUpperCase()+'</span>'
+      +(topic?'<span class="post-type">'+topic+'</span>':'')
+      +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+      +'<span style="margin-left:auto"></span>'
+      +'</div>'
+      +(PLT==='instagram'&&thumbHtml?'<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">'+thumbHtml+(cap?'<div class="post-caption" style="margin:0">'+cap+'</div>':'')+'</div>'
+        :PLT==='tiktok'&&thumbHtml?'<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">'+thumbHtml+(cap?'<div class="post-caption" style="margin:0">'+cap+'</div>':'')+'</div>'
+        :cap?'<div class="post-caption">'+cap+'</div>':'')
+      +'<div class="post-metrics">'
+      +(likes?'<span class="post-metric">&#10084; <span class="post-metric-val">'+likes+'</span></span>':'')
+      +(comms?'<span class="post-metric">&#128172; <span class="post-metric-val">'+comms+'</span></span>':'')
+      +(shares?'<span class="post-metric">&#128257; <span class="post-metric-val">'+shares+'</span></span>':'')
+      +(views?'<span class="post-metric">&#128065; <span class="post-metric-val">'+views+'</span></span>':'')
+      +(dur?'<span class="post-metric">&#9201; <span class="post-metric-val">'+dur+'</span></span>':'')
+      +'</div>'
+      +'<button class="expand-btn" onclick="togglePostAI('+i+',this)" id="expand-btn-'+i+'">&#9660; EXPAND AI ANALYSIS</button>'
+      +'<div class="ai-panel" id="ai-panel-'+i+'"></div>'
+      +'</div>';
+  }).join('');
+  if(!_showAll&&P.length>10){
+    tab.innerHTML+='<div style="text-align:center;margin-top:12px"><button class="btn btn-export" onclick="showAllPosts()" style="font-size:11px;padding:8px 20px">Show All '+P.length+' Posts &#9660;</button></div>';
+  }
+}
+function togglePostAI(idx,btn){
+  var panel=document.getElementById('ai-panel-'+idx);
+  if(!panel)return;
+  if(panel.classList.contains('show')){panel.classList.remove('show');btn.innerHTML='&#9660; EXPAND AI ANALYSIS';return;}
+  btn.innerHTML='&#9650; COLLAPSE';
+  var p=P[idx];if(!p){panel.classList.add('show');return;}
+  // Fix: baca content_analysis.ai_description juga (lebih lengkap)
+  var ca=p.content_analysis||{};
+  var vd=esc(ca.ai_description||p.ai_description||p.visual_description||ca.content_summary||'');
+  var origUrl=p.post_url||p.instagram_url||p.video_url||'';
+  var sent=getSent(p);var sclr=sentColor(sent);
+  var method=p.analysis_method||'caption_only';
+  var isIG=(PLT==='instagram');
+  var isFB=(PLT==='facebook');
+  var isTK=(PLT==='tiktok');
+  // Deteksi foto slide TikTok: media_type === "image" atau ada image_urls/images_list
+  var _tkImgs=[];
+  if(isTK){
+    var _imgList=p.images_list||p.image_urls||[];
+    if(_imgList.length>0){
+      _imgList.forEach(function(u){if(u)_tkImgs.push(proxyImg(u));});
+    } else if(p.image_url&&(p.media_type==='image'||p.media_type==='carousel'||p.media_type==='sidecar')){
+      _tkImgs.push(proxyImg(p.image_url));
+    }
+  }
+  var isTKSlide=isTK&&_tkImgs.length>0;
+  var html='';
+
+  // ── TikTok Foto Slide — render carousel ─────────────────────────────
+  if(isTKSlide){
+    var _scid='tkslide-'+idx;
+    html+='<div class="ai-panel-section">';
+    html+='<div class="ai-panel-title">&#128247; Foto Slide TikTok <span style="font-size:9px;color:var(--muted)">'+_tkImgs.length+' foto</span></div>';
+    html+='<div style="position:relative;background:#000;border-radius:8px;overflow:hidden;margin-bottom:8px">';
+    html+='<div id="'+_scid+'" style="display:flex;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform">';
+    _tkImgs.forEach(function(u){
+      html+='<img src="'+esc(u)+'" style="min-width:100%;max-height:460px;object-fit:contain;background:#111;display:block" onerror="this.src=\'\';this.style.background=\'#1a2035\'" />';
+    });
+    html+='</div>';
+    if(_tkImgs.length>1){
+      html+='<button onclick="igCarouselNav(\''+_scid+'\','+_tkImgs.length+',-1,\'cnt-'+_scid+'\')" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10">&#8249;</button>';
+      html+='<button onclick="igCarouselNav(\''+_scid+'\','+_tkImgs.length+',1,\'cnt-'+_scid+'\')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10">&#8250;</button>';
+      html+='<div id="cnt-'+_scid+'" style="position:absolute;top:8px;right:10px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;z-index:10">1 / '+_tkImgs.length+'</div>';
+      // Dots
+      html+='<div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:10">';
+      _tkImgs.forEach(function(u,di){html+='<div style="width:6px;height:6px;border-radius:50%;background:'+(di===0?'#fff':'rgba(255,255,255,.4)');html+=';" class="dot-'+_scid+'"></div>';});
+      html+='</div>';
+    }
+    html+='</div>';
+    if(origUrl) html+='<a href="'+esc(origUrl)+'" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none">&#128279; Buka di TikTok</a>';
+    html+='</div>';
+  }
+
+  // ── Media section: TikTok video, Instagram = foto + link ──
+  if(isIG){
+    var imgUrl=proxyImg(p.image_url||p.cover_url||'');
+    var medType=p.media_type||'image';
+    // Detect video/reel juga dari duration atau views (Apify kadang return type salah)
+    var _dur=(p.duration_sec||0);
+    var _views=(p.views||p.plays||0);
+    var isIGVideo=(medType==='video'||medType==='reel'||medType==='igtv'||_dur>0);
+    // Video/Reel: pakai video_url CDN langsung (bisa diplay inline), fallback ke embed
+    if(isIGVideo&&origUrl){
+      var _vidSrc=p.video_url||'';
+      var _thumb=proxyImg(p.image_url||p.cover_url||'');
+      html+='<div class="ai-panel-section">';
+      if(_vidSrc){
+        // Video CDN dari Apify — load langsung untuk audio support
+        // Proxy tidak dipakai karena browser blokir audio pada proxied video
+        var _directVid=_vidSrc;
+        var _proxyVid=proxyVideo(_vidSrc);
+        html+='<div style="background:#000;border-radius:8px;overflow:hidden;margin-bottom:8px;position:relative">';
+        html+='<video controls playsinline preload="metadata" style="width:100%;max-height:480px;display:block;background:#000" id="igvid-'+idx+'"'
+             +(_thumb?' poster="'+esc(proxyImg(_thumb))+'"':'')+
+             ' onerror="var v=this;if(v._tried_proxy){v.style.display=\'none\';v.nextElementSibling.style.display=\'block\';}else{v._tried_proxy=true;v.src=\''+_proxyVid.replace(/'/g,"\\'")+'\';">';
+        html+='<source src="'+esc(_directVid)+'" type="video/mp4">';
+        html+='</video>';
+        // Tombol unmute — muncul selama video muted
+        html+='<div id="umute-'+idx+'" onclick="var v=document.getElementById(\'igvid-'+idx+'\');v.muted=false;v.volume=1;this.style.display=\'none\';" style="position:absolute;bottom:50px;right:12px;background:rgba(0,0,0,.75);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:none">&#128264; Aktifkan Suara</div>';
+        // Script inject langsung untuk handle muted state
+        html+='<script>setTimeout(function(){var v=document.getElementById("igvid-'+idx+'");if(v){v.muted=false;v.volume=1;v.addEventListener("volumechange",function(){var b=document.getElementById("umute-'+idx+'");if(b)b.style.display=v.muted?"block":"none";});v.addEventListener("play",function(){v.muted=false;v.volume=1;});}},100);<\/script>';
+        html+='<div style="display:none;padding:16px;text-align:center">';
+        html+='<a href="'+esc(origUrl)+'" target="_blank" style="font-size:11px;color:var(--accent);font-weight:700">&#127910; Buka di Instagram</a>';
+        html+='</div>';
+        html+='</div>';
+        html+='<div style="font-size:9px;color:var(--muted);text-align:center">&#127910; REEL/VIDEO</div>';
+      } else {
+        // Fallback embed kalau tidak ada video_url
+        var _sc='';var _mIG=origUrl.match(/\/p\/([A-Za-z0-9_-]+)/)||origUrl.match(/\/reel\/([A-Za-z0-9_-]+)/);
+        if(_mIG)_sc=_mIG[1];
+        if(_sc){
+          html+='<div style="background:#000;border-radius:8px;overflow:hidden;margin-bottom:8px">';
+          html+='<iframe src="https://www.instagram.com/p/'+_sc+'/embed/captioned/" width="100%" height="480" style="border:none;display:block" allowfullscreen loading="lazy"></iframe>';
+          html+='</div>';
+        } else {
+          html+='<a href="'+esc(origUrl)+'" target="_blank" style="font-size:11px;color:var(--accent);font-weight:700">&#127910; Buka Reel di Instagram</a>';
+        }
+      }
+      html+='</div>';
+    }
+    var allImgs=[];
+    if(!isIGVideo){
+      if(p.images_list&&p.images_list.length>0){
+        p.images_list.forEach(function(u){if(u)allImgs.push(proxyImg(u));});
+      }
+      if(allImgs.length===0&&imgUrl)allImgs=[imgUrl];
+    }
+    if(allImgs.length>0){
+      var _cidx=0;
+      var _cid='carousel-'+idx;
+      html+='<div class="ai-panel-section">';
+      if(allImgs.length>1){
+        // Carousel multi-foto
+        html+='<div style="position:relative;background:#000;border-radius:8px;overflow:hidden;margin-bottom:8px">';
+        html+='<div id="'+_cid+'" style="display:flex;transition:transform .3s ease;will-change:transform">';
+        allImgs.forEach(function(u,i){
+          html+='<img src="'+esc(u)+'" style="min-width:100%;max-height:400px;object-fit:contain;background:#111" onerror="this.src=\'\';this.style.background=\'#1a2035\'" />';
+        });
+        html+='</div>';
+        // Prev button
+        html+='<button onclick="igCarouselNav(\''+_cid+'\','+allImgs.length+',-1,\'cnt-'+_cid+'\')" style="position:absolute;left:6px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">&#8249;</button>';
+        // Next button
+        html+='<button onclick="igCarouselNav(\''+_cid+'\','+allImgs.length+',1,\'cnt-'+_cid+'\')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">&#8250;</button>';
+        // Counter dots
+        html+='<div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px">';
+        allImgs.forEach(function(u,i){
+          html+='<div style="width:6px;height:6px;border-radius:50%;background:'+(i===0?'#fff':'rgba(255,255,255,.4)')+';transition:background .2s" class="dot-'+_cid+'"></div>';
+        });
+        html+='</div>';
+        // Counter text
+        html+='<div id="cnt-'+_cid+'" style="position:absolute;top:8px;right:10px;background:rgba(0,0,0,.5);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px">1 / '+allImgs.length+'</div>';
+        html+='</div>';
+        html+='<div style="font-size:9px;color:var(--muted);text-align:center">'+esc(medType.toUpperCase())+' &#183; '+allImgs.length+' foto &mdash; geser untuk lihat semua</div>';
+      } else {
+        // Single foto — tampil besar
+        html+='<div style="border-radius:10px;overflow:hidden;background:#111;margin-bottom:8px">';
+        html+='<img src="'+esc(allImgs[0])+'" style="width:100%;max-height:480px;object-fit:contain;display:block;background:#111" onerror="this.style.display=\'none\'" />';
+        html+='</div>';
+        if(p.location||p.created_at){
+          html+='<div style="font-size:10px;color:var(--muted);margin-bottom:4px">';
+          if(p.location) html+='&#128205; '+esc(p.location)+'&nbsp;&nbsp;';
+          if(p.created_at) html+=esc(p.created_at);
+          html+='</div>';
+        }
+      }
+      html+='</div>';
+    }
+    if(origUrl)html+='<div class="ai-panel-section"><a href="'+esc(origUrl)+'" target="_blank" style="font-size:11px;color:var(--accent);font-weight:700;text-decoration:none">&#128247; Buka di Instagram</a></div>';
+  } else if(isFB){
+    // ── Facebook expand — tidak perlu render media lagi (sudah ada di card) ──
+    var _fbVid=p.video_url||'';
+    var _fbImg=proxyImg(p.image_url||p.cover_url||'');
+    var _fbPostUrl=p.post_url||'';
+    // Tampilkan video kalau ada
+    if(_fbVid){
+      var _fbVProxy='/api/v1/proxy/image?url='+encodeURIComponent(_fbVid);
+      html+='<div class="ai-panel-section"><div class="ai-panel-title" style="color:#1877f2">&#127910; Video Facebook</div>';
+      html+='<div style="background:#0d1117;border-radius:10px;overflow:hidden;margin-bottom:6px">';
+      html+='<video controls playsinline preload="metadata" id="fbvid-'+idx+'" '
+        +'style="width:100%;max-height:360px;display:block;background:#000;object-fit:contain" muted '
+        +(_fbImg?' poster="'+esc(_fbImg)+'"':'')+' '
+        +'onerror="this.style.display=\'none\'">';
+      html+='<source src="'+esc(_fbVProxy)+'" type="video/mp4">';
+      html+='</video></div>';
+      html+='<script>setTimeout(function(){var v=document.getElementById("fbvid-'+idx+'");if(v){v.muted=false;v.volume=1;v.addEventListener("play",function(){v.muted=false;v.volume=1;});}},200);<\/script>';
+      html+='</div>';
+    }
+    // Reactions breakdown
+    var _rxns=p.reactions||{};
+    var _rxnTotal=Object.values(_rxns).reduce(function(a,b){return a+(b||0);},0);
+    if(_rxnTotal>0){
+      var _rxnIco={'like':'👍','love':'❤️','care':'🤗','haha':'😂','wow':'😮','sad':'😢','angry':'😡'};
+      html+='<div class="ai-panel-section"><div class="ai-panel-title" style="color:#1877f2">&#128077; Reactions</div>';
+      html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+      Object.entries(_rxns).forEach(function(kv){
+        if(kv[1]>0) html+='<span style="background:rgba(24,119,242,.1);color:#1877f2;border-radius:12px;padding:4px 10px;font-size:12px">'+(_rxnIco[kv[0]]||'👍')+' '+kv[0]+': <b>'+fmt(kv[1])+'</b></span>';
+      });
+      html+='</div></div>';
+    }
+    // Mentions + Tagged users
+    var _ments=(p.mentions||[]).concat(p.tagged_users||[]);
+    if(_ments.length>0){
+      html+='<div class="ai-panel-section"><div class="ai-panel-title">&#128273; Mentions & Tags</div>';
+      html+='<div style="display:flex;gap:4px;flex-wrap:wrap">';
+      _ments.slice(0,10).forEach(function(m){
+        html+='<span style="background:rgba(24,119,242,.1);color:#1877f2;border-radius:12px;padding:2px 8px;font-size:11px">@'+esc(m)+'</span>';
+      });
+      html+='</div></div>';
+    }
+    // Link ke post
+    if(_fbPostUrl) html+='<div class="ai-panel-section"><a href="'+esc(_fbPostUrl)+'" target="_blank" style="font-size:11px;color:#1877f2;font-weight:700;text-decoration:none">&#128279; Buka Post di Facebook</a></div>';
+  } else if(!isTKSlide) {
+    // TikTok foto slide sudah di-render di atas, skip video player
+    var videoUrl=p.video_url||p.post_url||'';
+    var vidId='';
+    var urlsToCheck=[videoUrl,origUrl,p.post_url||''];
+    for(var ui=0;ui<urlsToCheck.length;ui++){
+      var uMatch=urlsToCheck[ui].match(/\/video\/(\d{10,})/)||urlsToCheck[ui].match(/(\d{16,})/);
+      if(uMatch){vidId=uMatch[1];break;}
+    }
+    if(!vidId&&p.post_id&&/^\d{10,}$/.test(p.post_id))vidId=p.post_id;
+    if(vidId||origUrl||videoUrl){
+      var _thumb=proxyImg(p.cover_url||p.image_url||p.thumbnail||'');
+      var _vidDirect=p.video_url||'';
+      // Cek apakah video_url adalah direct MP4 (bukan halaman TikTok)
+      var _isMp4=_vidDirect&&(
+        _vidDirect.indexOf('.mp4')!==-1||
+        _vidDirect.indexOf('mime_type=video')!==-1||
+        _vidDirect.indexOf('api.apify.com/v2/key-value-stores')!==-1||
+        _vidDirect.indexOf('v19-webapp')!==-1||
+        _vidDirect.indexOf('v16-webapp')!==-1||
+        _vidDirect.indexOf('tiktokcdn')!==-1
+      );
+      // Apify KV URL sudah punya token, akses langsung tanpa proxy
+      var _vidProxy=_isMp4?(
+        _vidDirect.indexOf('api.apify.com')!==-1
+          ? _vidDirect
+          : '/api/v1/proxy/image?url='+encodeURIComponent(_vidDirect)
+      ):'';
+      var _openUrl=origUrl||videoUrl||('https://www.tiktok.com/@'+esc(PRF.username||'')+(vidId?'/video/'+vidId:''));
+      html+='<div class="ai-panel-section"><div class="ai-panel-title">&#127910; Video TikTok</div>';
+      if(_vidProxy){
+        // Ada direct MP4 → putar via proxy, unmute saat user interaksi
+        html+='<div style="background:#0d1117;border-radius:10px;overflow:hidden;margin-bottom:6px;position:relative">';
+        html+='<video controls playsinline preload="metadata" id="tkvid-'+idx+'" '
+          +'style="width:100%;max-height:480px;display:block;background:#000;object-fit:contain" '
+          +(_thumb?' poster="'+esc(_thumb)+'"':'')+' '
+          +'onerror="this.style.display=\'none\';document.getElementById(\'tklink-'+idx+'\').style.display=\'flex\'">';
+        html+='<source src="'+esc(_vidProxy)+'" type="video/mp4">';
+        html+='</video>';
+        html+='<div id="tklink-'+idx+'" style="display:none;justify-content:center;padding:16px">';
+        html+='<a href="'+esc(_openUrl)+'" target="_blank" style="background:#fe2c55;color:#fff;padding:8px 20px;border-radius:20px;font-size:12px;font-weight:800;text-decoration:none">&#9654; Buka di TikTok</a>';
+        html+='</div></div>';
+        // Unmute: set volume=1 dan muted=false saat user klik play
+        html+='<script>setTimeout(function(){'
+          +'var v=document.getElementById("tkvid-'+idx+'");'
+          +'if(!v)return;'
+          +'v.muted=false;v.volume=1;'
+          +'v.addEventListener("play",function(){v.muted=false;v.volume=1;});'
+          +'v.addEventListener("click",function(){v.muted=false;v.volume=1;});'
+          +'},100);<\/script>';
+      } else {
+        // Tidak ada direct MP4 — coba TikTok embed langsung jika ada vidId
+        if(vidId){
+          html+='<div style="border-radius:10px;overflow:hidden;background:#000;margin-bottom:6px">';
+          html+='<div style="max-width:420px;margin:0 auto">';
+          html+='<iframe src="https://www.tiktok.com/embed/v2/'+esc(vidId)+'?lang=en-US" '
+            +'width="100%" height="740" frameborder="0" scrolling="no" allowfullscreen="true" allow="encrypted-media;autoplay;clipboard-write;picture-in-picture" '
+            +'style="display:block;border:none;background:#000;width:100%;min-height:740px"></iframe>';
+          html+='</div>';
+          html+='</div>';
+        } else {
+          // Tidak ada vidId sama sekali → thumbnail + link
+          html+='<div style="border-radius:10px;overflow:hidden;background:#0d1117;position:relative;margin-bottom:6px">';
+          if(_thumb){
+            html+='<img src="'+esc(_thumb)+'" style="width:100%;max-height:400px;object-fit:cover;display:block;border-radius:10px" '
+              +'onerror="this.style.display=\'none\'">';
+          } else {
+            html+='<div style="height:200px;background:#111;border-radius:10px;display:flex;align-items:center;justify-content:center">'
+              +'<span style="font-size:40px;opacity:.3">&#127910;</span></div>';
+          }
+          html+='<a href="'+esc(_openUrl)+'" target="_blank" style="position:absolute;inset:0;display:flex;flex-direction:column;'
+            +'align-items:center;justify-content:center;gap:10px;background:rgba(0,0,0,.35);border-radius:10px;text-decoration:none">';
+          html+='<div style="width:64px;height:64px;background:rgba(254,44,85,.92);border-radius:50%;'
+            +'display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(254,44,85,.6)">'
+            +'<span style="font-size:26px;margin-left:6px;color:#fff">&#9654;</span></div>';
+          html+='<div style="font-size:12px;color:rgba(255,255,255,.9);font-weight:700;'
+            +'background:rgba(0,0,0,.5);padding:4px 12px;border-radius:20px">Buka & Putar di TikTok</div>';
+          html+='</a></div>';
+        }
+      }
+      html+='</div>';
+    }
+  }
+  // ── Metrics grid ─────────────────────────────────────────────────────
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:10px 0">';
+  html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#fff">'+fmt(p.likes||0)+'</div><div style="font-size:9px;color:var(--muted)">Likes</div></div>';
+  html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#fff">'+fmt(p.comments||0)+'</div><div style="font-size:9px;color:var(--muted)">Comments</div></div>';
+  html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#fff">'+fmt(p.shares||0)+'</div><div style="font-size:9px;color:var(--muted)">Shares</div></div>';
+  html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:800;color:#fff">'+fmt(p.views||p.plays||0)+'</div><div style="font-size:9px;color:var(--muted)">'+(isIG?'Views':'Views')+'</div></div>';
+  html+='</div>';
+  // ── Sentimen ──────────────────────────────────────────────────────────
+  html+='<div class="ai-panel-section"><div class="ai-panel-title">&#129302; Sentimen Konten</div>';
+  html+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px;color:'+sclr+'">'+(sent==='POSITIVE'?'&#128522;':sent==='NEGATIVE'?'&#128545;':'&#128528;')+'</span><span style="font-size:13px;font-weight:800;color:'+sclr+'">'+sent+'</span></div></div>';
+  // ── AI Description — natural paragraf ─────────────────────────────────
+  if(vd){
+    var methodBadge='';
+    if(method==='gemini_vision')methodBadge='<span style="font-size:9px;padding:1px 6px;border-radius:10px;background:rgba(0,212,170,.2);color:var(--accent);margin-left:6px">Gemini Vision</span>';
+    else if(method==='whisper_ocr')methodBadge='<span style="font-size:9px;padding:1px 6px;border-radius:10px;background:rgba(59,130,246,.2);color:var(--blue);margin-left:6px">Whisper+OCR</span>';
+    else methodBadge='<span style="font-size:9px;padding:1px 6px;border-radius:10px;background:rgba(74,85,104,.25);color:var(--muted);margin-left:6px">'+(isIG?'Caption Analysis':'Caption & Hashtag')+'</span>';
+    var formatted=vd.replace(/\n\n/g,'</p><p style="margin-top:8px">').replace(/\n/g,'<br>');
+    formatted='<p>'+formatted+'</p>';
+    html+='<div class="ai-panel-section"><div class="ai-panel-title">&#129302; AI Content Analysis'+methodBadge+'</div>';
+    html+='<div class="ai-panel-text" style="line-height:1.8">'+formatted+'</div></div>';
+    if(method==='caption_only'&&isIG){
+      html+='<div style="font-size:10px;color:var(--muted);background:rgba(74,85,104,.1);border:1px solid rgba(74,85,104,.2);border-radius:6px;padding:7px 10px;margin-top:6px">';
+      html+='&#128273; Analisis berdasarkan caption dan metadata post. Tambahkan <strong>GEMINI_API_KEY</strong> di .env untuk analisis foto lebih mendalam.';
+      html+='</div>';
+    }
+  }
+  // ── TikTok-specific: transcript & OCR ────────────────────────────────
+  if(!isIG){
+    var transcript=p.transcript||'';
+    if(transcript){
+      html+='<div class="ai-panel-section"><div class="ai-panel-title">&#127908; Speech Transcript</div>';
+      html+='<div class="ai-panel-text" style="background:rgba(0,212,170,.05);border:1px solid rgba(0,212,170,.15);border-radius:6px;padding:8px;font-style:italic">'+esc(transcript)+'</div></div>';
+    }
+    var ocr=p.ocr_text||'';
+    if(ocr){
+      html+='<div class="ai-panel-section"><div class="ai-panel-title">&#128247; Teks Visual di Layar (OCR)</div>';
+      html+='<div class="ai-panel-text">'+esc(ocr)+'</div></div>';
+    }
+    var negWords=p.detected_negative_words||[];
+    if(negWords.length>0){
+      html+='<div class="ai-panel-section"><div class="ai-panel-title" style="color:#f87171">&#9888;&#65039; Kata/Frasa Negatif Terdeteksi</div>';
+      html+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
+      negWords.forEach(function(w){html+='<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);font-weight:700">'+esc(w)+'</span>';});
+      html+='</div></div>';
+    } else if(method!=='caption_only'){
+      html+='<div class="ai-panel-section"><span style="font-size:10px;color:var(--green)">&#10003; Tidak ada kata negatif/kasar terdeteksi</span></div>';
+    }
+  }
+  // ── Caption full (Instagram) ──────────────────────────────────────────
+  if(isIG&&p.caption){
+    var fullCap=esc(p.caption);
+    html+='<div class="ai-panel-section"><div class="ai-panel-title">&#128222; Caption Lengkap</div>';
+    html+='<div class="ai-panel-text" style="white-space:pre-line;line-height:1.7">'+fullCap+'</div></div>';
+  }
+  // ── Topic & Mood ─────────────────────────────────────────────────────
+  if(p.topic)html+='<div class="ai-panel-section"><div class="ai-panel-title">&#127991;&#65039; Topic</div><div class="ai-panel-text" style="color:var(--accent);font-weight:700">'+esc(p.topic)+'</div></div>';
+  if(p.mood)html+='<div class="ai-panel-section"><div class="ai-panel-title">&#128519; Mood</div><div class="ai-panel-text">'+esc(p.mood)+'</div></div>';
+  // ── Hashtags ─────────────────────────────────────────────────────────
+  if(p.hashtags&&p.hashtags.length>0){
+    html+='<div class="ai-panel-section"><div class="ai-panel-title">&#127991;&#65039; Hashtags</div><div style="display:flex;flex-wrap:wrap;gap:4px">';
+    p.hashtags.slice(0,10).forEach(function(h){html+='<span style="font-size:9px;padding:1px 6px;border-radius:20px;background:rgba(0,212,170,.1);color:var(--accent);font-weight:600">#'+esc(h)+'</span>';});
+    html+='</div></div>';
+  }
+  // ── Link ke post asli ────────────────────────────────────────────────
+  if(origUrl)html+='<div class="ai-panel-section"><a href="'+esc(origUrl)+'" target="_blank" style="font-size:11px;color:var(--accent);font-weight:700;text-decoration:none">&#128279; Buka Post Asli</a></div>';
+  panel.innerHTML=html;
+  panel.classList.add('show');
+} // end togglePostAI
+function renderFBComments(){
+  var tab=document.getElementById('tab-comments');
+  if(!C.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128172;</div><div>Tidak ada komentar dari target</div></div>';return;}
+  tab.innerHTML='<div style="background:rgba(24,119,242,.06);border:1px solid rgba(24,119,242,.15);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:#1877f2;font-weight:700">&#128172; Komentar dari @'+esc(PRF.username||'target')+' ('+C.length+')</div>'
+    +C.map(function(c){
+      var text=esc(c.comment_text||c.content||c.text||'');
+      var date=esc(c.created_at||'');
+      var likes=Number(c.likes||0);
+      var sent=getSent(c);var sclr=sentCls(sent);
+      var postUrl=c.post_url||'';
+      var postCap=esc((c.post_caption||'').substring(0,80));
+      return '<div class="post-card">'
+        +'<div class="post-card-header">'
+        +(date?'<span class="post-date">'+date+'</span>':'')
+        +'<span class="post-type" style="background:rgba(24,119,242,.15);color:#1877f2">&#128172; COMMENT</span>'
+        +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+        +'</div>'
+        +(postCap?'<div style="background:rgba(24,119,242,.05);border:1px solid rgba(24,119,242,.1);border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:10px;color:#94a3b8">&#128221; pada: '+postCap+(postUrl?'<a href="'+esc(postUrl)+'" target="_blank" style="color:#1877f2;margin-left:6px">&#128279;</a>':'')+'</div>':'')
+        +'<div style="background:rgba(24,119,242,.04);border:1px solid rgba(24,119,242,.1);border-radius:8px;padding:10px 14px;margin-top:4px">'
+        +'<div style="font-size:10px;color:#1877f2;font-weight:700;margin-bottom:4px">&#128172; '+esc(PRF.username||'target')+'</div>'
+        +'<div style="font-size:14px;color:var(--text);line-height:1.6">'+text+'</div>'
+        +'</div>'
+        +(likes?'<div class="post-metrics" style="margin-top:6px"><span class="post-metric">&#128077; <span class="post-metric-val">'+fmt(likes)+'</span></span></div>':'')
+        +'</div>';
+    }).join('');
+}
+function renderFBReposts(){
+  var tab=document.getElementById('tab-reposts');
+  if(!R.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128257;</div><div>Tidak ada share/repost</div></div>';return;}
+  tab.innerHTML=R.map(function(r,i){
+    var cap=esc((r.original_caption||r.caption||r.content||'').substring(0,200));
+    var orig=esc(r.original_author||'');
+    var date=esc(r.repost_date||r.created_at||'');
+    var m=r.metrics||{};
+    var imgUrl=proxyImg(r.image_url||'');
+    var sent=getSent(r);var sclr=sentCls(sent);
+    return '<div class="post-card">'
+      +'<div class="post-card-header">'
+      +(date?'<span class="post-date">'+date+'</span>':'')
+      +'<span class="post-type" style="background:rgba(24,119,242,.15);color:#1877f2">&#128257; SHARE</span>'
+      +(orig?'<span style="font-size:9px;color:#1877f2;font-weight:700">dari '+orig+'</span>':'')
+      +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+      +'</div>'
+      +(imgUrl?'<img src="'+esc(imgUrl)+'" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:8px" onerror="this.style.display=\'none\'">':'')
+      +(cap?'<div class="post-caption">'+cap+'</div>':'')
+      +'<div class="post-metrics">'
+      +(m.likes?'<span class="post-metric">&#128077; <span class="post-metric-val">'+fmt(m.likes)+'</span></span>':'')
+      +(m.comments?'<span class="post-metric">&#128172; <span class="post-metric-val">'+fmt(m.comments)+'</span></span>':'')
+      +(m.shares?'<span class="post-metric">&#128257; <span class="post-metric-val">'+fmt(m.shares)+'</span></span>':'')
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+function renderComments(){
+  if(PLT==='x'||PLT==='twitter'){renderXComments();return;}
+  if(PLT==='facebook'){renderFBComments();return;}
+  var tab=document.getElementById('tab-comments');
+  if(!C.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128172;</div><div>Tidak ada komentar dari target</div></div>';return;}
+  tab.innerHTML=C.map(function(c){
+    var text=esc(c.comment_text||c.content||'');
+    var date=esc(c.created_at||'');
+    var likes=Number(c.likes||0);
+    var sent=getSent(c);var sclr=sentCls(sent);
+    var postUrl=c.post_url||'';
+    var postCap=esc((c.post_caption||'').substring(0,80));
+    var isReply=!!(c.is_reply||c.reply_to);
+    var replyTo=esc(c.reply_to||'');
+
+    // Badge tipe + username owner
+    var typeBadge='<span class="post-type" style="background:rgba(0,212,170,.15);color:var(--accent)">'
+      +(isReply?'&#128172; REPLY':'&#128172; COMMENT')+'</span>'
+      +'<span style="font-size:9px;font-weight:700;color:var(--text);background:rgba(255,255,255,.06);'
+      +'padding:2px 7px;border-radius:4px">@'+(esc(PRF.username||'target'))+'</span>';
+
+    // Info "reply ke @user" kalau ini adalah reply
+    var replyInfo='';
+    if(isReply&&replyTo){
+      replyInfo='<div style="font-size:11px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:4px;padding:4px 8px;background:rgba(255,255,255,.03);border-radius:4px;border-left:2px solid var(--accent)">'
+        +'<span style="opacity:.7">&#8627; reply ke</span>'
+        +'<span style="color:var(--accent);font-weight:800">@'+replyTo+'</span>'
+        +'</div>';
+    }
+
+    // Info postingan yang dikomentari
+    var postInfo='';
+    if(postUrl||postCap){
+      postInfo='<div style="background:rgba(0,212,170,.05);border:1px solid rgba(0,212,170,.1);'
+        +'border-radius:6px;padding:6px 10px;margin-bottom:8px;display:flex;align-items:center;gap:8px">'
+        +'<span style="font-size:10px;color:var(--muted)">&#128221; di post:</span>'
+        +(postCap?'<span style="font-size:10px;color:#94a3b8;flex:1;overflow:hidden;'
+          +'text-overflow:ellipsis;white-space:nowrap">'+postCap+'</span>':'')
+        +(postUrl?'<a href="'+esc(postUrl)+'" target="_blank" style="font-size:10px;color:var(--accent);'
+          +'font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0">&#128279; Lihat Post</a>':'')
+        +'</div>';
+    }
+
+    return '<div class="post-card">'
+      +'<div class="post-card-header">'
+      +(date?'<span class="post-date">'+date+'</span>':'')
+      +typeBadge
+      +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+      +'</div>'
+      +postInfo
+      +replyInfo
+      // Komentar utama — teks yang ditulis lalsz_7
+      +'<div style="background:rgba(0,212,170,.04);border:1px solid rgba(0,212,170,.12);'
+      +'border-radius:8px;padding:10px 14px;margin-top:4px">'
+      +'<div style="font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px;opacity:.7">'
+      +'&#128172; Komentar dari @'+(esc(PRF.username||'target'))+'</div>'
+      +'<div style="font-size:14px;color:var(--text);line-height:1.6;word-break:break-word">'+text+'</div>'
+      +'</div>'
+      +(likes?'<div class="post-metrics" style="margin-top:6px">'
+        +'<span class="post-metric">&#10084; <span class="post-metric-val">'+fmt(likes)+'</span></span>'
+        +'</div>':'')
+      +'</div>';
+  }).join('');
+}
+function renderReposts(){
+  if(PLT==='x'||PLT==='twitter'){renderXReposts();return;}
+  if(PLT==='facebook'){renderFBReposts();return;}
+  var tab=document.getElementById('tab-reposts');
+  if(!R.length){tab.innerHTML='<div class="empty-state"><div class="empty-ico">&#128257;</div><div>Tidak ada repost</div></div>';return;}
+  tab.innerHTML=R.map(function(r,i){
+    var cap=esc((r.original_caption||r.caption||r.content||'').substring(0,200));
+    var orig=esc(r.original_author||r.author||'');
+    var date=esc(r.repost_date||r.created_at||'');
+    var m=r.metrics||{};
+    var mLikes   = Number(m.likes    ||r.likes   ||0);
+    var mComments= Number(m.comments ||r.comments||0);
+    var mShares  = Number(m.shares   ||r.shares  ||0);
+    var mViews   = Number(m.plays    ||r.plays   ||m.views||r.views||0);
+    var sent=getSent(r);var sclr=sentCls(sent);
+
+    // ── Ambil semua URL yang mungkin ──────────────────────────────────────
+    var postUrl = r.post_url||r.video_url||r.repost_url||'';
+    var vidSrc  = r.video_file_url||r.video_url||'';
+    var thumbUrl= r.cover_url||r.image_url||r.thumbnail_url||'';
+    // DEBUG: log repost data untuk diagnosa
+    if(i===0) console.log('[REPOST DEBUG] r=',JSON.stringify({id:r.id,post_url:r.post_url,video_url:r.video_url,cover_url:r.cover_url,original_author:r.original_author}));
+
+    // ── Extract TikTok video ID dari post_url atau video_url ──────────────
+    var ttId='';
+    var ttUrls=[postUrl,vidSrc,r.original_url||'',r.id||''];
+    for(var ui=0;ui<ttUrls.length;ui++){
+      if(!ttUrls[ui])continue;
+      // Format: /video/12345 atau video/12345
+      var um=ttUrls[ui].match(/\/video\/(\d{10,})/);
+      if(um){ttId=um[1];break;}
+      // Format: pure numeric ID (r.id)
+      if(/^\d{10,}$/.test(ttUrls[ui])){ttId=ttUrls[ui];break;}
+    }
+    // ── Repost tanpa thumbnail: akan di-fetch via oEmbed setelah render ────
+    var _repostCardId='rp-card-'+i;
+    // ── Media HTML ────────────────────────────────────────────────────────
+    var mediaHtml='';
+    if(PLT==='tiktok'||ttId||postUrl.indexOf('tiktok')!==-1){
+      var rThumb=thumbUrl?proxyImg(thumbUrl):'';
+      var rOpenUrl=postUrl||(ttId?('https://www.tiktok.com/video/'+ttId):'');
+
+      // Cek CDN/KV video URL
+      var rVidDirect='';
+      if(r.video_url&&r.video_url.indexOf('tiktok.com/@')===-1&&r.video_url.indexOf('tiktok.com/video/')===-1&&r.video_url.indexOf('tiktok.com/t/')===-1){
+        rVidDirect=r.video_url;
+      }
+      var rIsMp4=rVidDirect&&(rVidDirect.indexOf('.mp4')!==-1||rVidDirect.indexOf('api.apify.com/v2/key-value-stores')!==-1||rVidDirect.indexOf('v19-webapp')!==-1||rVidDirect.indexOf('v16-webapp')!==-1||rVidDirect.indexOf('tiktokcdn')!==-1||rVidDirect.indexOf('mime_type=video')!==-1);
+      var rVidProxy=rIsMp4?(rVidDirect.indexOf('api.apify.com')!==-1?rVidDirect:'/api/v1/proxy/image?url='+encodeURIComponent(rVidDirect)):'';
+      var _embedId=ttId||r.id||'';
+
+      if(rVidProxy){
+        // CDN/KV URL tersedia → video player, fallback embed kalau expired
+        mediaHtml='<div style="border-radius:10px;overflow:hidden;margin-bottom:10px;background:#000;position:relative">';
+        mediaHtml+='<video controls playsinline preload="metadata" id="rpvid-'+i+'" style="width:100%;max-height:400px;display:block;background:#000;object-fit:contain" '+(rThumb?' poster="'+esc(rThumb)+'"':'')+' onerror="this.style.display=\'none\';var fb=document.getElementById(\'rpfb-'+i+'\');if(fb)fb.style.display=\'block\';">';
+        mediaHtml+='<source src="'+esc(rVidProxy)+'" type="video/mp4">';
+        mediaHtml+='</video>';
+        mediaHtml+='<div id="rpfb-'+i+'" style="display:none">';
+        if(_embedId){mediaHtml+='<iframe src="https://www.tiktok.com/embed/v2/'+esc(_embedId)+'?lang=en-US" width="100%" height="740" frameborder="0" allowfullscreen="true" allow="encrypted-media;autoplay" style="border:none;display:block"></iframe>';}
+        mediaHtml+='</div></div>';
+        mediaHtml+='<script>setTimeout(function(){var v=document.getElementById("rpvid-'+i+'");if(!v)return;v.muted=false;v.volume=1;v.addEventListener("play",function(){v.muted=false;v.volume=1;});setTimeout(function(){if(v.readyState<2){v.style.display="none";var fb=document.getElementById("rpfb-'+i+'");if(fb)fb.style.display="block";}},4000);},100);<\/script>';
+      } else if(_embedId){
+        // Tidak ada CDN → langsung iframe TikTok embed dengan thumbnail placeholder
+        mediaHtml='<div style="border-radius:10px;overflow:hidden;margin-bottom:10px;background:#0d1117;position:relative">';
+        if(rThumb){
+          // Thumbnail sebagai background saat iframe loading
+          mediaHtml+='<img src="'+esc(rThumb)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.3;z-index:0" onerror="this.style.display=\'none\'">';
+        }
+        mediaHtml+='<div style="position:relative;z-index:1">';
+        mediaHtml+='<iframe src="https://www.tiktok.com/embed/v2/'+esc(_embedId)+'?lang=en-US" width="100%" height="740" frameborder="0" allowfullscreen="true" allow="encrypted-media;autoplay" style="border:none;display:block;background:transparent"></iframe>';
+        mediaHtml+='</div>';
+        mediaHtml+='</div>';
+      } else {
+        // Tidak ada ID → thumbnail + tombol
+        mediaHtml='<div style="border-radius:10px;overflow:hidden;margin-bottom:10px;background:#0d1117;position:relative">';
+        if(rThumb){mediaHtml+='<img src="'+esc(rThumb)+'" style="width:100%;max-height:360px;object-fit:cover;display:block">';}
+        else{mediaHtml+='<div style="height:180px;display:flex;align-items:center;justify-content:center"><span style="font-size:48px;opacity:.3">&#127910;</span></div>';}
+        if(rOpenUrl){mediaHtml+='<a href="'+esc(rOpenUrl)+'" target="_blank" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4);text-decoration:none"><div style="background:rgba(254,44,85,.92);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center"><span style="color:#fff;font-size:26px;margin-left:5px">&#9654;</span></div></a>';}
+        mediaHtml+='</div>';
+      }
+    } else {
+      // ── Non-TikTok (Instagram, dll): video proxy atau foto ────────────
+      if(vidSrc){
+        var proxied='/api/v1/proxy/image?url='+encodeURIComponent(vidSrc);
+        var thumb=thumbUrl?proxyImg(thumbUrl):'';
+        // Cek apakah ini Instagram URL — kalau iya ambil shortcode untuk fallback embed
+        var _rpIgSC='';
+        if(postUrl){var _rpIgM=postUrl.match(/\/(?:p|reel)\/([A-Za-z0-9_-]+)/);if(_rpIgM)_rpIgSC=_rpIgM[1];}
+        var _rpFallback=_rpIgSC
+          ?'<iframe src="https://www.instagram.com/p/'+_rpIgSC+'/embed/" width="100%" height="440" frameborder="0" scrolling="no" allowtransparency="true" allowfullscreen="true" style="display:block;border:none;background:#000"></iframe>'
+          :(postUrl?'<div style="padding:16px;text-align:center"><a href="'+esc(postUrl)+'" target="_blank" style="color:var(--accent);font-size:12px">&#128279; Buka di Instagram</a></div>':'');
+        mediaHtml='<div style="background:#000;border-radius:10px;overflow:hidden;margin-bottom:10px;position:relative">'
+          +'<video controls playsinline preload="metadata" '
+          +'style="width:100%;max-height:400px;display:block;background:#000;object-fit:contain" '
+          +'id="rpvid-'+i+'"'+(thumb?' poster="'+esc(thumb)+'"':'')+' '
+          +'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">'
+          +'<source src="'+esc(proxied)+'" type="video/mp4">'
+          +'<source src="'+esc(vidSrc)+'" type="video/mp4">'
+          +'</video>'
+          +'<div style="display:none">'+_rpFallback+'</div>'
+          +'</div>';
+      } else if(thumbUrl){
+        // Punya thumbnail tapi tidak ada video URL langsung
+        // Coba embed Instagram jika ada shortcode di postUrl
+        var _igSC='';
+        if(postUrl){var _igM=postUrl.match(/\/(?:p|reel)\/([A-Za-z0-9_-]+)/);if(_igM)_igSC=_igM[1];}
+        if(_igSC){
+          // Embed Instagram inline — bisa diputar tanpa redirect
+          mediaHtml='<div style="border-radius:10px;overflow:hidden;margin-bottom:10px;background:#000">';
+          mediaHtml+='<iframe src="https://www.instagram.com/p/'+_igSC+'/embed/" '
+            +'width="100%" height="440" frameborder="0" scrolling="no" '
+            +'allowtransparency="true" allowfullscreen="true" '
+            +'style="display:block;border:none;background:#000"></iframe>';
+          mediaHtml+='</div>';
+        } else {
+          mediaHtml='<div style="border-radius:10px;overflow:hidden;margin-bottom:10px;position:relative">'
+            +'<img src="'+esc(proxyImg(thumbUrl))+'" style="width:100%;max-height:400px;object-fit:cover;display:block;border-radius:10px" '
+            +'onerror="this.parentElement.style.display=\'none\'">';
+          if(postUrl) mediaHtml+='<a href="'+esc(postUrl)+'" target="_blank" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);border-radius:10px;text-decoration:none">'
+            +'<div style="width:56px;height:56px;background:rgba(225,48,108,.9);border-radius:50%;display:flex;align-items:center;justify-content:center"><span style="font-size:22px;margin-left:4px;color:#fff">&#9654;</span></div>'
+            +'</a>';
+          mediaHtml+='</div>';
+        }
+      } else if(postUrl){
+        mediaHtml='<div style="padding:10px 0">'
+          +'<a href="'+esc(postUrl)+'" target="_blank" style="color:var(--accent);font-size:12px;font-weight:700">&#128279; Buka Postingan</a>'
+          +'</div>';
+      }
+    }
+    // ── Metrics row ───────────────────────────────────────────────────────
+    var metricsHtml='<div class="post-metrics" style="flex-wrap:wrap;gap:6px;margin-top:6px">';
+    if(mLikes   >0) metricsHtml+='<span class="post-metric">&#10084; <span class="post-metric-val">'+fmt(mLikes)+'</span></span>';
+    if(mComments>0) metricsHtml+='<span class="post-metric">&#128172; <span class="post-metric-val">'+fmt(mComments)+'</span></span>';
+    if(mShares  >0) metricsHtml+='<span class="post-metric">&#128257; <span class="post-metric-val">'+fmt(mShares)+'</span></span>';
+    if(mViews   >0) metricsHtml+='<span class="post-metric">&#128065; <span class="post-metric-val">'+fmt(mViews)+'</span></span>';
+    metricsHtml+='</div>';
+
+    // ── Hashtags ──────────────────────────────────────────────────────────
+    var hashHtml='';
+    if(r.hashtags&&r.hashtags.length){
+      hashHtml='<div style="margin-top:5px;font-size:10px;color:var(--accent);line-height:1.6">'
+        +r.hashtags.slice(0,8).map(function(h){return'<span style="margin-right:4px">#'+esc(h)+'</span>';}).join('')
+        +'</div>';
+    }
+
+    return '<div class="post-card">'
+      +'<div class="post-card-header">'
+      +(date?'<span class="post-date">'+date+'</span>':'')
+      +'<span class="post-type">REPOST</span>'
+      +(orig?'<span style="font-size:9px;color:var(--accent);font-weight:700">dari @'+orig+'</span>':'')
+      +'<span class="post-sentiment '+sclr+'">'+sentLbl(sent)+'</span>'
+      +'</div>'
+      +mediaHtml
+      +(cap?'<div class="post-caption">'+cap+'</div>':'')
+      +metricsHtml
+      +hashHtml
+      +'<button class="expand-btn" onclick="toggleRepostAI('+i+',this)">&#9660; EXPAND AI ANALYSIS</button>'
+      +'<div class="ai-panel" id="rp-panel-'+i+'"></div>'
+      +'</div>';
+  }).join('');
+  // Unmute semua video repost (non-TikTok) setelah render
+  setTimeout(function(){
+    R.forEach(function(r,i){
+      var v=document.getElementById('rpvid-'+i);
+      if(!v)return;
+      v.muted=false;v.volume=1;
+      v.addEventListener('play',function(){v.muted=false;v.volume=1;});
+    });
+  },300);
+}
+function toggleRepostAI(idx,btn){
+  var panel=document.getElementById('rp-panel-'+idx);if(!panel)return;
+  if(panel.classList.contains('show')){panel.classList.remove('show');btn.innerHTML='&#9660; EXPAND AI ANALYSIS';return;}
+  btn.innerHTML='&#9650; COLLAPSE';
+  var r=R[idx];if(!r){panel.classList.add('show');return;}
+
+  var postUrl=r.video_url||r.post_url||'';
+  var ca=r.content_analysis||{};
+  // Baca ai_description dari semua kemungkinan field
+  var vd=esc(ca.ai_description||r.ai_description||r.visual_description||ca.content_summary||'');
+  var topic=esc(ca.topic||r.topic||'');
+  var mood=esc(ca.mood||r.mood||'');
+  var sent=getSent(r);var sclr=sentColor(sent);
+  var orig=esc(r.original_author||r.author||'');
+  var html='';
+
+  // ── Link ke post asli ────────────────────────────────────────────────
+  if(postUrl){
+    html+='<div class="ai-panel-section" style="margin-bottom:8px">';
+    html+='<a href="'+esc(postUrl)+'" target="_blank" '
+      +'style="display:inline-flex;align-items:center;gap:6px;background:rgba(254,44,85,.1);'
+      +'border:1px solid rgba(254,44,85,.3);color:#fe2c55;padding:6px 14px;border-radius:20px;'
+      +'font-size:11px;font-weight:800;text-decoration:none">'
+      +'&#9654; Tonton di '+(PLT==='tiktok'?'TikTok':'Instagram')
+      +(orig?' — @'+orig:'')+'</a>';
+    html+='</div>';
+  }
+
+  // ── Metrics grid ──────────────────────────────────────────────────────
+  var m=r.metrics||{};
+  var mL=Number(m.likes||r.likes||0);
+  var mC=Number(m.comments||r.comments||0);
+  var mS=Number(m.shares||r.shares||0);
+  var mV=Number(m.plays||r.plays||m.views||r.views||0);
+  if(mL||mC||mS||mV){
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:10px 0">';
+    html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:15px;font-weight:800;color:#fff">'+fmt(mL)+'</div><div style="font-size:9px;color:var(--muted)">Likes</div></div>';
+    html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:15px;font-weight:800;color:#fff">'+fmt(mC)+'</div><div style="font-size:9px;color:var(--muted)">Comments</div></div>';
+    html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:15px;font-weight:800;color:#fff">'+fmt(mS)+'</div><div style="font-size:9px;color:var(--muted)">Shares</div></div>';
+    html+='<div style="background:var(--panel3);border-radius:6px;padding:8px;text-align:center"><div style="font-size:15px;font-weight:800;color:#fff">'+fmt(mV)+'</div><div style="font-size:9px;color:var(--muted)">Views</div></div>';
+    html+='</div>';
+  }
+
+  // ── Sentimen ──────────────────────────────────────────────────────────
+  html+='<div class="ai-panel-section"><div class="ai-panel-title">&#129302; Sentimen Konten</div>';
+  html+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px;color:'+sclr+'">'+(sent==='POSITIVE'?'&#128522;':sent==='NEGATIVE'?'&#128545;':'&#128528;')+'</span><span style="font-size:13px;font-weight:800;color:'+sclr+'">'+sent+'</span></div></div>';
+
+  // ── AI Description ────────────────────────────────────────────────────
+  if(vd){
+    var formatted=vd.replace(/\n\n/g,'</p><p style="margin-top:8px">').replace(/\n/g,'<br>');
+    html+='<div class="ai-panel-section"><div class="ai-panel-title">&#129302; AI Content Analysis <span style="font-size:9px;padding:1px 6px;border-radius:10px;background:rgba(254,44,85,.15);color:#fe2c55;margin-left:6px">Repost</span></div>';
+    html+='<div class="ai-panel-text" style="line-height:1.8"><p>'+formatted+'</p></div></div>';
+  } else {
+    // Bangun description dari field yang ada
+    var capText=esc((r.original_caption||r.caption||r.content||'').substring(0,400));
+    if(capText||topic){
+      html+='<div class="ai-panel-section"><div class="ai-panel-title">&#129302; Analisis Konten</div>';
+      html+='<div class="ai-panel-text" style="line-height:1.8">';
+      if(capText) html+='<p><b>Caption:</b> '+capText+'</p>';
+      if(topic)   html+='<p style="margin-top:6px"><b>Topik:</b> '+topic+'</p>';
+      if(mood)    html+='<p style="margin-top:6px"><b>Suasana:</b> '+mood+'</p>';
+      html+='</div></div>';
+    }
+  }
+
+  // ── Topic & Mood ──────────────────────────────────────────────────────
+  if(topic) html+='<div class="ai-panel-section"><div class="ai-panel-title">&#127991;&#65039; Topic</div><div class="ai-panel-text" style="color:var(--accent);font-weight:700">'+topic+'</div></div>';
+  if(mood)  html+='<div class="ai-panel-section"><div class="ai-panel-title">&#128519; Mood</div><div class="ai-panel-text">'+mood+'</div></div>';
+
+  // ── Hashtags ──────────────────────────────────────────────────────────
+  var hts=(r.hashtags||[]).concat(ca.key_themes||[]);
+  var htsSeen={};
+  hts=hts.filter(function(h){if(htsSeen[h])return false;htsSeen[h]=1;return true;});
+  if(hts.length){
+    html+='<div class="ai-panel-section"><div class="ai-panel-title">&#127991;&#65039; Hashtags</div><div style="display:flex;flex-wrap:wrap;gap:4px">';
+    hts.slice(0,12).forEach(function(h){
+      html+='<span style="font-size:9px;padding:1px 6px;border-radius:20px;background:rgba(0,212,170,.1);color:var(--accent);font-weight:600">#'+esc(h)+'</span>';
+    });
+    html+='</div></div>';
+  }
+
+  // ── Kata negatif ──────────────────────────────────────────────────────
+  var negW=r.detected_negative_words||ca.detected_negative_words||[];
+  if(negW.length){
+    html+='<div class="ai-panel-section"><div class="ai-panel-title" style="color:#f87171">&#9888;&#65039; Kata Negatif Terdeteksi</div>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
+    negW.forEach(function(w){html+='<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);font-weight:700">'+esc(w)+'</span>';});
+    html+='</div></div>';
+  }
+
+  if(!html)html='<div class="ai-panel-section" style="color:#888;font-size:11px">Tidak ada data AI tambahan.</div>';
+  panel.innerHTML=html;panel.classList.add('show');
+}
+function exportPDF(){
+  if(!P.length&&!PRF.username){alert('Scan akun dulu!');return;}
+  var p=PRF;var ins=INS;var bd=ins.sentiment_breakdown||{};var risk=ins.risk_score||0;
+  var rclr=risk>=70?'#dc2626':risk>=40?'#d97706':'#16a34a';
+  var pos=pct(bd.POSITIVE||0);var neg=pct(bd.NEGATIVE||0);var neu=pct(bd.NEUTRAL||0);
+  var now=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+  var postsRows=P.slice(0,10).map(function(post,i){var cap=(post.caption||post.content||'').substring(0,100);var sent=getSent(post);var sclr=sent==='POSITIVE'?'#16a34a':sent==='NEGATIVE'?'#dc2626':'#6b7280';return'<tr style="border-bottom:1px solid #e5e7eb"><td style="padding:5px;font-size:10px;color:#6b7280">#'+(i+1)+'</td><td style="padding:5px;font-size:10px">'+(cap||'-')+'</td><td style="padding:5px;font-size:10px;font-weight:700;color:'+sclr+'">'+sent.substring(0,3)+'</td><td style="padding:5px;font-size:10px;text-align:right">'+fmt(post.likes||0)+'</td><td style="padding:5px;font-size:10px;text-align:right">'+fmt(post.views||post.plays||0)+'</td></tr>';}).join('');
+  var flags=(ins.green_flags||[]).map(function(f){return'<li style="color:#16a34a;margin-bottom:2px;font-size:11px">'+esc(String(f))+'</li>';}).join('')+(ins.red_flags||[]).map(function(f){return'<li style="color:#dc2626;margin-bottom:2px;font-size:11px">'+esc(String(f))+'</li>';}).join('');
+  var content='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>VORSA Report - @'+(p.username||'target')+'</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:sans-serif;padding:28px;max-width:900px;margin:0 auto;color:#111}h2{font-size:13px;font-weight:800;text-transform:uppercase;margin:18px 0 8px;border-bottom:2px solid #e5e7eb;padding-bottom:4px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}.sb{background:#f9fafb;border:1px solid #e5e7eb;border-radius:7px;padding:10px;text-align:center}.sbv{font-size:18px;font-weight:900}.sbl{font-size:9px;color:#6b7280}table{width:100%;border-collapse:collapse}th{background:#f3f4f6;padding:6px;font-size:9px;text-align:left;color:#6b7280}.footer{margin-top:28px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:9px;color:#9ca3af;text-align:center}</style></head><body>';
+  content+='<div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #111"><div><div style="font-size:22px;font-weight:900;color:#111">VORSA</div><div style="font-size:10px;color:#6b7280">Intelligence Report &middot; '+now+'</div></div><div style="margin-left:auto;text-align:right"><div style="font-size:16px;font-weight:900">@'+(p.username||'-')+'</div><div style="font-size:11px;color:#6b7280">'+(p.full_name||'')+' '+(p.verified?'&#10003; Verified':'')+'</div><div style="font-size:10px;color:#6b7280">'+fmt(p.followers||0)+' followers</div></div></div>';
+  content+='<h2>Sentiment Analysis</h2><div class="grid3"><div class="sb"><div class="sbv" style="color:#16a34a">'+pos+'%</div><div class="sbl">Positive</div></div><div class="sb"><div class="sbv" style="color:#dc2626">'+neg+'%</div><div class="sbl">Negative</div></div><div class="sb"><div class="sbv" style="color:#6b7280">'+neu+'%</div><div class="sbl">Neutral</div></div></div>';
+  content+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:7px;padding:10px;font-size:11px;margin-bottom:14px;line-height:1.6">'+(ins.ai_narrative_short||ins.summary_text||'-')+'</div>';
+  content+='<h2>Risk: '+risk+'/100</h2><div style="height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;margin-bottom:14px"><div style="height:100%;width:'+risk+'%;background:'+rclr+'"></div></div>';
+  content+='<h2>Flags</h2><ul style="list-style:none;margin-bottom:14px;padding:0">'+(flags||'<li style="color:#6b7280;font-size:11px">Tidak ada.</li>')+'</ul>';
+  content+='<h2>10 Latest Posts</h2><table><tr><th>#</th><th>Caption</th><th>Sent.</th><th>Likes</th><th>Views</th></tr>'+postsRows+'</table>';
+  content+='<div class="footer">VORSA Social Intelligence Platform &middot; '+now+'</div></body></html>';
+  var win=window.open('','_blank');win.document.write(content);win.document.close();setTimeout(function(){win.print();},800);
+}
+</script>

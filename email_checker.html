@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang='id'><head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1.0'>
+<title>OSINT Intelligence Center - Social Radar</title>
+<style>
+:root{--bg:#07090f;--panel:#0c0f18;--panel2:#111520;--panel3:#161b28;--border:#1e2538;--text:#e2e8f0;--muted:#56637a;--accent:#fe2c55;--blue:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#a855f7;--cyan:#06b6d4;--red:#f87171;--radius:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;min-height:100vh;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#1e2538;border-radius:3px}
+.hdr{background:var(--panel);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.logo{font-size:16px;font-weight:900;color:#fff}.logo span{color:var(--accent)}
+.badge{background:linear-gradient(135deg,var(--purple),#6366f1);color:#fff;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:800;margin-left:6px}
+.nav-links{margin-left:auto;display:flex;gap:8px}
+.nav-link{color:var(--muted);font-size:11px;text-decoration:none;padding:4px 10px;border-radius:6px;border:1px solid var(--border);transition:all .2s}
+.nav-link:hover{color:var(--text);border-color:var(--accent)}
+.main{flex:1;padding:28px 24px;max-width:1100px;margin:0 auto;width:100%}
+.hero{text-align:center;margin-bottom:24px}
+.hero h1{font-size:26px;font-weight:900;margin-bottom:6px}
+.hero h1 span{color:var(--purple)}
+.hero p{font-size:13px;color:var(--muted);max-width:520px;margin:0 auto;line-height:1.6}
+.mode-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+.mode-tab{padding:10px 24px;border-radius:10px;border:2px solid var(--border);background:var(--panel);color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.mode-tab.active{border-color:var(--purple);color:#fff;background:rgba(168,85,247,.12)}
+.mode-tab:hover{border-color:rgba(168,85,247,.4)}
+.sbox{background:var(--panel);border:2px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:24px;transition:border-color .2s}
+.sbox:focus-within{border-color:var(--purple)}
+.srow{display:flex;gap:10px;align-items:center}
+.sinput{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px 16px;font-size:14px;outline:none;font-family:inherit;transition:border-color .2s}
+.sinput:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(168,85,247,.1)}
+.sbtn{background:linear-gradient(135deg,var(--purple),#6366f1);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
+.sbtn:hover{opacity:.9;transform:translateY(-1px)}.sbtn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.disc{margin-top:10px;font-size:10px;color:var(--muted);text-align:center}
+.smsg{text-align:center;padding:12px;font-size:12px;color:var(--muted);display:none;background:var(--panel);border-radius:10px;margin-bottom:16px;line-height:1.7}
+.smsg.show{display:block}
+.res{display:none}.res.show{display:block}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.ct{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.ct::after{content:'';flex:1;height:1px;background:var(--border)}
+.rg{text-align:center;padding:6px 0}.rsn{font-size:44px;font-weight:900;line-height:1}
+.rlv{font-size:11px;font-weight:800;padding:3px 12px;border-radius:20px;display:inline-block;margin-top:5px}
+.rbar{height:7px;background:var(--border);border-radius:4px;overflow:hidden;margin:8px 0 3px}
+.rbf{height:100%;border-radius:4px;transition:width .8s}
+.sr{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.si{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sv{font-size:17px;font-weight:800;color:#fff}.sl{font-size:10px;color:var(--muted)}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px;margin-top:4px}
+.pc{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:7px 9px;display:flex;align-items:center;gap:7px}
+.pc.found{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.06)}
+.pc.nf{opacity:.4}
+.pd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pn{font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdom{font-size:9px;color:var(--muted)}
+.bi{background:var(--panel2);border:1px solid rgba(248,113,113,.3);border-radius:8px;padding:9px 11px;margin-bottom:7px}
+.bn{font-size:12px;font-weight:700;color:var(--red);margin-bottom:3px}
+.bm{font-size:10px;color:var(--muted);margin-bottom:5px}
+.bt2{display:flex;flex-wrap:wrap;gap:3px}.bt3{font-size:9px;padding:1px 6px;border-radius:6px;background:rgba(248,113,113,.15);color:var(--red)}
+.sti{background:var(--panel2);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:9px 11px;margin-bottom:7px}
+.stf{font-size:12px;font-weight:700;color:var(--orange)}.stm{font-size:10px;color:var(--muted);margin-top:3px}
+.fl{display:flex;flex-direction:column;gap:4px}
+.fi{font-size:11px;line-height:1.5;display:flex;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)}.fi:last-child{border-bottom:none}
+.es{text-align:center;padding:28px 20px;color:var(--muted)}.ei{font-size:36px;margin-bottom:8px;opacity:.4}
+.tbar{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tb{padding:7px 12px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tb.active{color:#fff;border-bottom-color:var(--purple)}
+.tc{background:var(--border);color:var(--muted);font-size:9px;padding:1px 5px;border-radius:8px;margin-left:3px}
+.tc.f{background:rgba(34,197,94,.2);color:var(--green)}
+.nb{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:9px 12px;font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6}
+.nb a{color:var(--blue)}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.info-row:last-child{border-bottom:none}
+.info-lbl{color:var(--muted);font-weight:600}
+.info-val{color:var(--text);font-weight:700;text-align:right;max-width:200px}
+.pill-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:20px;font-weight:600;margin:2px}
+.link-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);color:var(--blue);text-decoration:none;font-size:11px;font-weight:700;margin:4px;transition:all .2s}
+.link-btn:hover{background:rgba(59,130,246,.2)}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}.srow{flex-direction:column}}
+</style></head><body>
+<div class='hdr'>
+  <div class='logo'>Social<span>Radar</span></div>
+  <span class='badge'>OSINT INTELLIGENCE</span>
+  <div class='nav-links'>
+    <a href='/social-radar' class='nav-link'>Social Radar</a>
+    <a href='/docs' class='nav-link'>API Docs</a>
+  </div>
+</div>
+<div class='main'>
+  <div class='hero'>
+    <h1>OSINT <span>Intelligence</span> Center</h1>
+    <p>Investigasi jejak digital target &mdash; scan email untuk akun sosial &amp; breach, atau nomor HP untuk info carrier &amp; reputasi spam.</p>
+  </div>
+  <div class='mode-tabs'>
+    <button class='mode-tab active' id='mt-email' onclick='setMode("email")'>&#128231; Email Check</button>
+    <button class='mode-tab' id='mt-phone' onclick='setMode("phone")'>&#128241; Phone Check</button>
+  </div>
+  <div class='sbox'>
+    <div class='srow'>
+      <input class='sinput' id='ti' type='text' placeholder='target@gmail.com' autocomplete='off' onkeydown='if(event.key==="Enter")doScan()'/>
+      <button class='sbtn' id='sbtn' onclick='doScan()'>Scan</button>
+    </div>
+    <div class='disc' id='disc'>Data hanya digunakan untuk OSINT legal. Tidak disimpan di server.</div>
+  </div>
+  <div class='smsg' id='smsg'></div>
+  <div class='res' id='res'></div>
+</div>
+<script>
+const AK='RAHASIA_AGENSIDETEKTIF_123';
+var md='email',pt='found',ld=null;
+function e(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function f(n){n=Number(n)||0;if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return String(n);}
+function setMode(m){
+  md=m;
+  document.querySelectorAll('.mode-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('mt-'+m).classList.add('active');
+  var inp=document.getElementById('ti');
+  if(m==='email'){inp.placeholder='target@gmail.com';inp.type='email';}
+  else{inp.placeholder='08123456789 atau +6281234567890';inp.type='tel';}
+  document.getElementById('res').classList.remove('show');
+  document.getElementById('smsg').classList.remove('show');
+}
+function sw(t){
+  pt=t;
+  document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('active');});
+  var el=document.getElementById('tb-'+t);if(el)el.classList.add('active');
+  if(ld)rp(ld);
+}
+async function doScan(){
+  var target=(document.getElementById('ti').value||'').trim();
+  if(!target){alert('Masukkan target!');return;}
+  var b=document.getElementById('sbtn');
+  var s=document.getElementById('smsg');
+  var r=document.getElementById('res');
+  b.disabled=true;b.innerHTML='<span class="spin"></span>Scanning...';
+  s.innerHTML=md==='email'?'Memindai email via holehe (120+ platform) + HIBP + Hudson Rock...<br><small>30-90 detik.</small>':'Memindai nomor HP: carrier, stealer logs, spam...<br><small>10-30 detik.</small>';
+  s.classList.add('show');r.classList.remove('show');
+  try{
+    var rs=await fetch('/api/v1/osint/check',{method:'POST',headers:{'Content-Type':'application/json','X-API-KEY':AK},body:JSON.stringify({target:target})});
+    var d=await rs.json();
+    if(!rs.ok||d.status==='error'){s.innerHTML='Error: '+e(d.error||d.detail||rs.status);return;}
+    ld=d;pt='found';s.classList.remove('show');
+    if(d.input_type==='phone'||d.normalized)renderPhone(d);else renderEmail(d);
+    r.classList.add('show');
+  }catch(ex){s.innerHTML='Error: '+e(ex.message);}
+  finally{b.disabled=false;b.innerHTML='Scan';}
+}
+function renderEmail(d){
+  var rv=document.getElementById('res');
+  var risk=d.risk||{};var fp=d.account_footprint||{};var bd=d.breach_data||{};
+  var hibp=bd.hibp||{};var hr=bd.hudson_rock||{};
+  var rc=risk.color||'#56637a';var sc=risk.score||0;
+  var reg=fp.registered||[];var nf=fp.not_found||[];
+  var br=hibp.breaches||[];var st=hr.stealers||[];
+  var rf=risk.red_flags||[];var gf=risk.green_flags||[];
+  var h='';
+  h+='<div class="g3">';
+  h+='<div class="card"><div class="ct">Risk Score Email</div><div class="rg">';
+  h+='<div class="rsn" style="color:'+rc+'">'+sc+'</div>';
+  h+='<div class="rlv" style="color:'+rc+';background:'+rc+'22">'+e(risk.level||'--')+'</div>';
+  h+='<div class="rbar"><div class="rbf" style="width:'+sc+'%;background:'+rc+'"></div></div>';
+  h+='<div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:5px">'+e(risk.verdict||'')+'</div>';
+  h+='</div></div>';
+  h+='<div class="card"><div class="ct">Account Footprint</div>';
+  h+='<div class="sr"><div class="si" style="background:rgba(34,197,94,.12)">&#9989;</div><div><div class="sv" style="color:var(--green)">'+reg.length+'</div><div class="sl">Platform Ditemukan</div></div></div>';
+  h+='<div class="sr"><div class="si" style="background:rgba(86,99,122,.12)">&#10006;</div><div><div class="sv">'+nf.length+'</div><div class="sl">Tidak Terdaftar</div></div></div>';
+  h+='<div class="sr"><div class="si" style="background:rgba(59,130,246,.12)">&#128200;</div><div><div class="sv">'+fp.total_checked+'</div><div class="sl">Total Dicek</div></div></div>';
+  h+='</div>';
+  h+='<div class="card"><div class="ct">Breach Status</div>';
+  h+='<div class="sr"><div class="si" style="background:rgba(248,113,113,.12)">&#128163;</div><div><div class="sv" style="color:'+(br.length>0?'var(--red)':'var(--green)')+'">'+(br.length||0)+'</div><div class="sl">Data Breach (HIBP)</div></div></div>';
+  h+='<div class="sr"><div class="si" style="background:rgba(245,158,11,.12)">&#128034;</div><div><div class="sv" style="color:'+(st.length>0?'var(--orange)':'var(--green)')+'">'+(st.length||0)+'</div><div class="sl">Stealer Logs</div></div></div>';
+  h+='<div style="font-size:11px;color:var(--muted);margin-top:4px">Waktu: '+d.scan_duration_sec+'s</div>';
+  h+='</div></div>';
+  if(rf.length||gf.length){
+    h+='<div class="card" style="margin-bottom:14px"><div class="ct">Flags</div><div class="fl">';
+    rf.forEach(function(x){h+='<div class="fi"><span style="color:var(--red)">&#9888;</span><span>'+e(x)+'</span></div>';});
+    gf.forEach(function(x){h+='<div class="fi"><span style="color:var(--green)">&#10003;</span><span>'+e(x)+'</span></div>';});
+    h+='</div></div>';
+  }
+  h+='<div class="card" style="margin-bottom:14px"><div class="ct">Platform Terdaftar</div>';
+  h+='<div class="tbar"><div class="tb active" id="tb-found" onclick="sw(\'found\')">Ditemukan <span class="tc f">'+reg.length+'</span></div><div class="tb" id="tb-all" onclick="sw(\'all\')">Semua <span class="tc">'+fp.total_checked+'</span></div></div><div id="pw"></div></div>';
+  h+='<div class="g2">';
+  h+='<div class="card"><div class="ct">HaveIBeenPwned</div>';
+  if(br.length>0){
+    br.slice(0,8).forEach(function(b2){
+      h+='<div class="bi"><div class="bn">'+e(b2.name)+'</div><div class="bm">'+e(b2.domain||'')+(b2.breach_date?' &middot; '+e(b2.breach_date):'')+'</div><div class="bt2">'+(b2.data_classes||[]).slice(0,4).map(function(dc){return'<span class="bt3">'+e(dc)+'</span>';}).join('')+'</div></div>';
+    });
+  }else{h+='<div class="nb">'+(hibp.note?e(hibp.note):'Tambah HIBP_API_KEY di .env untuk full breach check per email.')+'</div>';}
+  h+='</div>';
+  h+='<div class="card"><div class="ct">Hudson Rock Stealer Logs</div>';
+  if(st.length>0){
+    st.slice(0,5).forEach(function(s2){h+='<div class="sti"><div class="stf">'+e(s2.stealer_family||'Unknown')+'</div><div class="stm">'+(s2.date_compromised?e(s2.date_compromised)+' &nbsp;':'')+(s2.country?e(s2.country):'')+'</div></div>';});
+  }else if(hr.checked){h+='<div class="es"><div class="ei">&#9989;</div><div>Tidak ditemukan di stealer logs</div></div>';}
+  else{h+='<div style="color:var(--muted);font-size:12px">'+(hr.error?e(hr.error):'Tidak ada data')+'</div>';}
+  h+='</div></div>';
+  rv.innerHTML=h;rp(d);
+}
+function rp(d){
+  var wrap=document.getElementById('pw');if(!wrap)return;
+  var fp=d.account_footprint||{};
+  var list=pt==='found'?(fp.registered||[]):(fp.registered||[]).concat(fp.not_found||[]);
+  if(!list.length){wrap.innerHTML='<div class="es"><div class="ei">&#128270;</div><div>Tidak ada data</div></div>';return;}
+  wrap.innerHTML='<div class="pg">'+list.map(function(p){var found=p.registered===true;return'<div class="pc '+(found?'found':'nf')+'"><div class="pd" style="background:'+(found?'#22c55e':'#56637a')+'"></div><div><div class="pn">'+e(p.platform||'?')+'</div>'+(p.domain?'<div class="pdom">'+e(p.domain)+'</div>':'')+'</div></div>';}).join('')+'</div>';
+}
+function renderPhone(d){
+  var rv=document.getElementById('res');
+  var risk=d.risk||{};var pi=d.phone_info||{};var sl=d.stealer_logs||{};
+  var sp=d.spam_reputation||{};var soc=d.social_links||{};var nm=d.normalized||{};
+  var rc=risk.color||'#56637a';var sc=risk.score||0;
+  var rf=risk.red_flags||[];var gf=risk.green_flags||[];
+  var h='';
+  h+='<div class="g3">';
+  h+='<div class="card"><div class="ct">Risk Score Nomor</div><div class="rg">';
+  h+='<div class="rsn" style="color:'+rc+'">'+sc+'</div>';
+  h+='<div class="rlv" style="color:'+rc+';background:'+rc+'22">'+e(risk.level||'--')+'</div>';
+  h+='<div class="rbar"><div class="rbf" style="width:'+sc+'%;background:'+rc+'"></div></div>';
+  h+='<div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:5px">'+e(risk.verdict||'')+'</div>';
+  h+='</div></div>';
+  h+='<div class="card"><div class="ct">Info Nomor HP</div>';
+  h+='<div class="info-row"><span class="info-lbl">Format Lokal</span><span class="info-val">'+e(nm.local||nm.raw||d.phone||'--')+'</span></div>';
+  h+='<div class="info-row"><span class="info-lbl">Format E.164</span><span class="info-val">'+e(nm.e164||'--')+'</span></div>';
+  h+='<div class="info-row"><span class="info-lbl">Operator</span><span class="info-val">'+e(pi.carrier||'Tidak diketahui')+'</span></div>';
+  h+='<div class="info-row"><span class="info-lbl">Tipe</span><span class="info-val">'+e(pi.line_type||'mobile')+'</span></div>';
+  h+='<div class="info-row"><span class="info-lbl">Negara</span><span class="info-val">'+e(pi.country_name||pi.country||nm.country_code||'--')+'</span></div>';
+  h+='</div>';
+  h+='<div class="card"><div class="ct">Status Keamanan</div>';
+  h+='<div class="sr"><div class="si" style="background:rgba(245,158,11,.12)">&#128034;</div><div><div class="sv" style="color:'+(sl.compromised?'var(--orange)':'var(--green)')+'">'+(sl.stealer_count||0)+'</div><div class="sl">Stealer Logs</div></div></div>';
+  h+='<div class="sr"><div class="si" style="background:rgba(248,113,113,.12)">&#128683;</div><div><div class="sv" style="color:'+(sp.spam_reported?'var(--red)':'var(--green)')+'">'+(sp.spam_reported?'SPAM':'AMAN')+'</div><div class="sl">Reputasi Spam</div></div></div>';
+  h+='<div style="font-size:11px;color:var(--muted);margin-top:4px">Waktu scan: '+d.scan_duration_sec+'s</div>';
+  h+='</div></div>';
+  if(rf.length||gf.length){
+    h+='<div class="card" style="margin-bottom:14px"><div class="ct">Flags</div><div class="fl">';
+    rf.forEach(function(x){h+='<div class="fi"><span style="color:var(--red)">&#9888;</span><span>'+e(x)+'</span></div>';});
+    gf.forEach(function(x){h+='<div class="fi"><span style="color:var(--green)">&#10003;</span><span>'+e(x)+'</span></div>';});
+    h+='</div></div>';
+  }
+  h+='<div class="g2">';
+  h+='<div class="card"><div class="ct">Stealer Logs (Hudson Rock)</div>';
+  if(sl.stealers&&sl.stealers.length>0){
+    sl.stealers.slice(0,5).forEach(function(s2){h+='<div class="sti"><div class="stf">'+e(s2.stealer_family||'Unknown')+'</div><div class="stm">'+(s2.date_compromised?e(s2.date_compromised)+' &nbsp;':'')+(s2.country?e(s2.country):'')+'</div></div>';});
+  }else if(sl.checked){h+='<div class="es"><div class="ei">&#9989;</div><div>Tidak ditemukan di stealer logs</div></div>';}
+  else{h+='<div style="color:var(--muted);font-size:12px">'+(sl.error?e(sl.error):'Tidak ada data')+'</div>';}
+  h+='</div>';
+  h+='<div class="card"><div class="ct">Social Media Links</div>';
+  h+='<div style="font-size:11px;color:var(--muted);margin-bottom:8px">Klik untuk verifikasi manual:</div>';
+  var plats=soc.platforms||[];
+  if(plats.length>0){plats.forEach(function(p){h+='<a href="'+e(p.check_url)+'" target="_blank" class="link-btn">&#128279; '+e(p.name)+'</a>';});}
+  else{h+='<div style="color:var(--muted);font-size:12px">Tidak ada data</div>';}
+  if(sp.note)h+='<div class="nb" style="margin-top:8px">'+e(sp.note)+'</div>';
+  h+='</div></div>';
+  rv.innerHTML=h;
+}
+</script>
+</body>
+</html>
